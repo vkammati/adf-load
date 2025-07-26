@@ -1,0 +1,24 @@
+{
+	"name": "T_SCHEDULE_DAILY",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_DATAEXTRACTION_SAP_HANA_DELTA_TO_ADLS",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-11-09T10:20:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}

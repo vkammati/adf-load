@@ -1,0 +1,246 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "az-dna-323-eun-adf-ijbblcazgocbqvosxkwz"
+        },
+        "LS_GSAP_HANA_connectionString": {
+            "value": "SERVERNODE=saphpdd.europe.shell.com:30415;UID=R_ADF_EDPL"
+        },
+        "LS_ADLS_LANDING_properties_typeProperties_url": {
+            "value": "https://azdna322eunadlslifozpfav.dfs.core.windows.net/"
+        },
+        "LS_GSAP_BW_properties_typeProperties_clientId": {
+            "value": "110"
+        },
+        "LS_GSAP_BW_properties_typeProperties_userName": {
+            "value": "R_ADF_EDS"
+        },
+        "LS_GSAP_BW_properties_typeProperties_server": {
+            "value": "sapdpd4.europe.shell.com"
+        },
+        "LS_GSAP_BW_properties_typeProperties_systemNumber": {
+            "value": "04"
+        },
+        "LS_KEYVAULT_DATTA_properties_typeProperties_baseUrl": {
+            "value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/"
+        },
+         "LS_SHAREPOINT_properties_typeProperties_url": {
+            "value": "https://eu001-sp.shell.com/sites/UG-DS-ChennaiEUSAOps-MARS/_api/web/GetFileByServerRelativeUrl('@{linkedService().RelativeURL}')/$value"
+        },
+        "DATTA-SHIR_properties_typeProperties_linkedInfo_resourceId": {
+            "value": "/subscriptions/962dcf90-fa29-4ad2-a894-2031d908751f/resourcegroups/AZ-AS-RGP-EX-P-SEQ01404-ADF-SHIR-MUN-PROD_ETSOM/providers/Microsoft.DataFactory/factories/eu-mun-shared-adf-prod-master/integrationruntimes/SHIRMunichPROD"
+        },
+        "default_properties_GL_CONFIG_CATALOG_NAME_value": {
+            "value": "cross_ds-unitycatalog-prd"
+        },
+	"default_properties_GL_CONFIG_SCHEMA_NAME_value": {
+            "value": "raw-ds"
+        },
+        "default_properties_GL_CONFIG_TABLE_NAME_value": {
+            "value": "load_process_config"
+        },
+        "default_properties_GL_ENV_value": {
+            "value": "prd"
+        },
+        "default_properties_GL_UNIQUE_REPO_BRANCH_ID_value": {
+            "value": "datta"
+        },
+        "default_properties_GL_REPOS_PATH_value": {
+            "value": "/Repos/sede-x-DATTA-FCB/datta_fcb/"
+        },
+        "default_properties_GL_DATABRICKS_URL_value": {
+            "value": "https://adb-1622098023422716.16.azuredatabricks.net"
+        },
+        "default_properties_GL_CLUSTER_ID_value": {
+            "value": "0116-061107-lj692awv"
+        },
+        "default_properties_GL_MINERVA_REPOS_PATH_FI_value": {
+            "value": "/Repos/sede-x-DATTA-FI-EUH/datta_fi_euh/"
+        },
+        "default_properties_GL_MINERVA_REPOS_PATH_MASTER_value": {
+            "value": "/Repos/sede-x-DATTA-MD-ATTR-EUH/datta_md_attr_euh/"
+        },
+        "default_properties_GL_KV_SP_FALCONLITE_ClIENTID_value": {
+            "value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/FALCONLITE-SP-CLIENT-ID/b97ef1af20134c5a940554f887e6e487?api-version=7.0"
+        },
+        "default_properties_GL_KV_SP_FALCONLITE_ACS_TOKEN_value": {
+            "value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/FALCONLITE-SP-CLIENT-SECRET/7908b6d513f94000a2cab0b952be4a56?api-version=7.0"
+        },
+        "default_properties_GL_SP_FALCONLITE_TENANT_ID_value": {
+            "value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+        },
+		"default_properties_GL_SHAREPOINT_CONFIG_TABLE_NAME_value": {
+            "value": "sharepoint_process_config"
+        },
+        "default_properties_GL_SP_FALCONLITE_RESOURCE_ID_value": {
+            "value": "00000003-0000-0ff1-ce00-000000000000"
+        },
+        "default_properties_GL_CONTROLS_LANDING_PATH_value": {
+            "value": "internal/adf_prd/CONTROLS/"
+        },
+        "default_properties_GL_SQL_SERVERNAME_value": {
+            "value": "az-dna-313-eun-sq-lylsytmxovtglrcgjldo.database.windows.net"
+        },
+        "default_properties_GL_SQL_DB_value": {
+            "value": "az-dna-313-eun-sqdb-kvgobntxycpafsqeirdz"
+        },
+        "default_properties_GL_SQL_USERNAME_value": {
+            "value": "EDSSQLADMIN"
+        },
+        "default_properties_GL_CONTROLS_ORACLE_HOSTNAME_value": {
+            "value": "AENPL03710ASDO1.linux.shell.com"
+        },
+        "default_properties_GL_CONTROLS_ORACLE_PORT_value": {
+            "value": "1648"
+        },
+        "default_properties_GL_CONTROLS_ORACLE_SERVICE_NAME_value": {
+            "value": "RWSH634P_SRV"
+        },
+        "default_properties_GL_CONTROLS_ORACLE_USERNAME_value": {
+            "value": "INC_MGMT_READ"
+        },
+        "default_properties_GL_CONTROLS_LAW_BASE_URL_value": {
+            "value": "https://api.loganalytics.io/v1/workspaces/a6c91029-944a-4d4d-89f2-4aa6e9bcac1c"
+        },
+        "default_properties_GL_CONTROLS_LAW_ENTRA_RESOURCE_ID_value": {
+            "value": "https://api.loganalytics.io"
+        },
+        "default_properties_GL_KV_SP_MARS_ACS_TOKEN_value": {
+            "value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/MARS-SP-CLIENT-SECRET/8b711f1e2a9c4cffb0f6e8b26ba3b3a6?api-version=7.0"
+        },
+        "default_properties_GL_KV_SP_MARS_CLIENTID_value": {
+            "value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/MARS-SP-CLIENT-ID/34720f1c66d24a7a80d50487f39f84c6?api-version=7.0"
+        },
+        "default_properties_GL_SP_MARS_RESOURCE_ID_value": {
+            "value": "00000003-0000-0ff1-ce00-000000000000"
+        },
+        "default_properties_GL_SP_URL_value": {
+            "value": "eu001-sp.shell.com"
+        },
+        "default_properties_GL_SP_FALCONLITE_FOLDER_URL_value": {
+            "value": "https://eu001-sp.shell.com/sites/AAFAA6687/_api/web/GetFolderByServerRelativeUrl('/sites/AAFAA6687/Shared Documents/Documents/Downstream/Lubes/DR IT Documents/Falcon Lite Mapping File Monthly Update/MANUAL_FEED_PROD/')/Files"
+        },
+        "default_properties_GL_SP_MARS_TENANT_ID_value": {
+            "value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+        },
+        "default_properties_GL_SP_MARS_FOLDERURL2_value": {
+            "value": "'/sites/UG-DS-ChennaiEUSAOps-MARS/Shared%20Documents/MARS/MARS/PROD/Input%20files%20by%20R&A%20team'"
+        },
+        "default_properties_GL_SP_MARS_FOLDERURL1_value": {
+            "value": "'/sites/UG-DS-ChennaiEUSAOps-MARS/Shared%20Documents/MARS/MARS/PROD/Standard%20input%20files'"
+        },
+        "default_properties_GL_ADLS_MARS_SINK_PATH_value": {
+            "value": "internal/adf_prd/FS_Usecase_MARS"
+        },
+	"default_properties_GL_CERES_DELTALAKE_EXTERNAL_PATH_value": {
+            "value": "curated/ceres_prd/"
+        },
+        "default_properties_GL_REPOS_PATH_CERES_CURATED_value": {
+            "value": "/Repos/sede-x-DATTA-CERES-CURATED/datta_ceres_curated/"
+        },
+        "default_properties_GL_CERES_BASE_INBOUND_URL_value": {
+            "value": "https://ceemas.de/api/shell/movements/inbound"
+        },
+        "default_properties_GL_CERES_BASE_OUTBOUND_URL_value": {
+            "value": "https://ceemas.de/api/shell/movements/outbound"
+        },
+        "default_properties_GL_CERES_INBOUND_TOKEN_value": {
+            "value": "https://ceemas.de/api/auth/token"
+        },
+        "default_properties_GL_CERES_INBOUND_CLIENT_ID_value": {
+            "value": "shell_nl"
+        },
+        "default_properties_GL_CERES_INBOUND_CLIENT_SECRET_value": {
+            "value": "CERES-CLIENTSECRET"
+        },
+        "default_properties_GL_DATABRICKS_SUBSCRIPTIONS_value": {
+            "value": "0ebad5f3-3649-41bc-868d-36a7baee3cb6"
+        },
+        "default_properties_GL_DATABRICKS_RESOURCEGROUPS_value": {
+            "value": "az-dna-323-rg-tmkwonxcohwrlcwnkhbb"
+        },
+        "default_properties_GL_DATABRICKS_WORKSPACE_value": {
+            "value": "az-dna-323-eun-adb-tddvriretwh"
+        },
+        "default_properties_GL_CERES_OUTBOUND_TOKEN_value": {
+            "value": "https://ceemas.de/api/auth/token"
+        },
+        "default_properties_GL_CERES_OUTBOUND_CLIENT_ID_value": {
+            "value": "shell_nl"
+        },
+        "default_properties_GL_CERES_OUTBOUND_CLIENT_SECRET_value": {
+            "value": "CERES-CLIENTSECRET"
+        },
+	"default_properties_GL_KV_SP_CONTROLS_CLIENTID_value": {
+            "value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/AZ-AS-DATTA-CONTROLS-SP-CLIENT-ID/4202d5314df2438d8edd019225c98283?api-version=7.0"
+        },
+        "default_properties_GL_KV_SP_CONTROLS_ACS_TOKEN_value": {
+            "value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/AZ-AS-DATTA-CONTROLS-SP-CLIENT-SECRET/3205d786d65e4dee8c99b025ae07ad3b?api-version=7.0"
+        },
+        "default_properties_GL_SP_CONTROLS_TENANT_ID_value": {
+            "value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+        },
+        "default_properties_GL_SP_CONTROLS_RESOURCE_ID_value": {
+            "value": "00000003-0000-0ff1-ce00-000000000000"
+        },
+        "default_properties_GL_SP_CONTROLS_FOLDER_URL_AAD_LOG_value": {
+            "value": "https://eu001-sp.shell.com/sites/AAAAA2150/_api/web/GetFolderByServerRelativeUrl('/sites/AAAAA2150/Documents/EDPL for DS/Project Management/SG3. Executing/DATTA/Security/EDS DS Subscription Controls/Controls Automation/AAD change logs/')/Files"
+        },
+	"default_properties_GL_ADF_TRIGGER_API_value": {
+            "value": "https://management.azure.com/subscriptions/0ebad5f3-3649-41bc-868d-36a7baee3cb6/resourceGroups/az-dna-323-rg-tfnffxpmqhlwshhixtmw/providers/Microsoft.DataFactory/factories/az-dna-323-eun-adf-ijbblcazgocbqvosxkwz/"
+        },
+	"default_properties_GL_TECH_EH_REPO_PATH_value": {
+            "value": "/Repos/sede-x-DATTA-TECH-EH/datta_tech_eh/"
+        },
+	"default_properties_GL_AZ_AS_SPN_DATTA_WDS_CLIENT_ID_value": {
+            "value": "c6cc0cb8-1940-4ab5-9d7b-7ff6fa6e3045"
+        },
+	"default_properties_GL_AZ_AS_SPN_DATTA_WDS_TENANT_ID_value": {
+            "value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+        },
+	"default_properties_GL_COPA_JOB_ID_EUH_D_value": {
+            "value": "410254273248814"
+        },
+	"default_properties_GL_COPA_JOB_ID_EUH_M_value": {
+            "value": "794307103052618"
+        },
+	"default_properties_GL_FALCONLITE_JOB_ID_value": {
+            "value": "730807097450139"
+        },
+	"LS_ASD_ORACLE_DB_connectionString": {
+            "value": "host=@{linkedService().Oracle_HostName};port=@{linkedService().Oracle_Port};serviceName=@{linkedService().Oracle_ServiceName};user id=@{linkedService().Oracle_UserName}"
+        },
+        "LS_LAW_properties_typeProperties_aadResourceId": {
+            "value": "@{linkedService().Law_Entra_ResourceID}"
+        },
+        "LS_LAW_properties_typeProperties_url": {
+            "value": "@{linkedService().Law_Base_URL}"
+        },
+        "LS_SHAREPOINT_FALCONLITE_properties_typeProperties_url": {
+            "value": "https://eu001-sp.shell.com/sites/AAFAA6687/_api/web/GetFileByServerRelativeUrl('@{linkedService().RelativeURL}')/$value"
+        },
+        "LS_SQL_DB_properties_typeProperties_database": {
+            "value": "@{linkedService().DB_Name}"
+        },
+        "LS_SQL_DB_properties_typeProperties_server": {
+            "value": "@{linkedService().Server_Name}"
+        },
+        "LS_SQL_DB_properties_typeProperties_userName": {
+            "value": "@{linkedService().User_Name}"
+        },
+        "LS_CERES_RESTAPI_INBOUND_properties_typeProperties_clientId": {
+            "value": "@{linkedService().CERES_INBOUND_CLIEND_ID}"
+        },
+        "LS_CERES_RESTAPI_INBOUND_properties_typeProperties_url": {
+            "value": "@{linkedService().CERES_BASE_INBOUND_URL}"
+        },
+        "LS_CERES_RESTAPI_OUTBOUND_properties_typeProperties_clientId": {
+            "value": "@{linkedService().CERES_OUTBOUND_CLIEND_ID}"
+        },
+        "LS_CERES_RESTAPI_OUTBOUND_properties_typeProperties_url": {
+            "value": "@{linkedService().CERES_BASE_OUTBOUND_URL}"
+        }
+    }
+}

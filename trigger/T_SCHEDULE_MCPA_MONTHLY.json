@@ -1,0 +1,39 @@
+{
+	"name": "T_SCHEDULE_MCPA_MONTHLY",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_DATAEXTRACTION_SAP_BW_DELTA_TO_ADLS_MCPA",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Month",
+				"interval": 1,
+				"startTime": "2024-10-16T05:31:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						9
+					],
+					"monthDays": [
+						9,
+						10,
+						11,
+						12,
+						13
+					]
+				}
+			}
+		}
+	}
+}
