@@ -1,0 +1,37 @@
+{
+	"name": "DS_LAW",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_LAW",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Law_Base_URL": {
+					"value": "@dataset().Law_Base_URL",
+					"type": "Expression"
+				},
+				"Law_Entra_ResourceID": {
+					"value": "@dataset().Law_Entra_ResourceID",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Law_Base_URL": {
+				"type": "string"
+			},
+			"Law_Entra_ResourceID": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "query"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

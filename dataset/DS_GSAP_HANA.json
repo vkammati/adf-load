@@ -1,0 +1,16 @@
+{
+	"name": "DS_GSAP_HANA",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_GSAP_HANA",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DATA INGESTION"
+		},
+		"annotations": [],
+		"type": "SapHanaTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

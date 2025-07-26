@@ -1,0 +1,41 @@
+{
+	"name": "DS_SQL_DB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_DB",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Server_Name": {
+					"value": "@dataset().Server_Name",
+					"type": "Expression"
+				},
+				"DB_Name": {
+					"value": "@dataset().DB_Name",
+					"type": "Expression"
+				},
+				"User_Name": {
+					"value": "@dataset().User_Name",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Server_Name": {
+				"type": "string"
+			},
+			"DB_Name": {
+				"type": "string"
+			},
+			"User_Name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

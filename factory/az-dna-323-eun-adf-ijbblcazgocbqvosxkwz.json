@@ -1,0 +1,145 @@
+{
+	"name": "az-dna-323-eun-adf-ijbblcazgocbqvosxkwz",
+	"properties": {
+		"globalParameters": {
+			"GL_CONFIG_CATALOG_NAME": {
+				"type": "string",
+				"value": "cross_ds-unitycatalog-prd"
+			},
+			"GL_CONFIG_TABLE_NAME": {
+				"type": "string",
+				"value": "load_process_config"
+			},
+			"GL_ENV": {
+				"type": "string",
+				"value": "prd"
+			},
+			"GL_UNIQUE_REPO_BRANCH_ID": {
+				"type": "string",
+				"value": "datta"
+			},
+			"GL_REPOS_PATH": {
+				"type": "string",
+				"value": "/Repos/sede-x-DATTA-FCB/datta_fcb/"
+			},
+			"GL_DATABRICKS_URL": {
+				"type": "string",
+				"value": "https://adb-6334860511683672.12.azuredatabricks.net/"
+			},
+			"GL_JOB_ID": {
+				"type": "string",
+				"value": "75620286926779"
+			},
+			"GL_xDnA_LANDING_PATH": {
+				"type": "string",
+				"value": "RAW/W00012-MCPA-DCPA-DATA-PROD-LANDING/Transaction/"
+			},
+			"GL_xDnA_STORAGE_ACCOUNT": {
+				"type": "string",
+				"value": "shell31eunadls2dtgumfeib"
+			},
+			"GL_CLUSTER_ID": {
+				"type": "string",
+				"value": "0402-112326-u3o85tve"
+			},
+			"GL_xDnA_URL": {
+				"type": "string",
+				"value": "https://shell31eunadls2dtgumfeib.dfs.core.windows.net"
+			},
+			"GL_REPOS_PATH_FI": {
+				"type": "string",
+				"value": "/Repos/sede-x-DATTA-FI-EUH/datta_fi_euh/"
+			},
+			"GL_UNIQUE_REPO_BRANCH_ID_SCHEMA": {
+				"type": "string",
+				"value": "gsap"
+			},
+			"GL_REPOS_PATH_MASTER": {
+				"type": "string",
+				"value": "/Repos/sede-x-DATTA-MD-ATTR-EUH/datta_md_attr_euh/"
+			},
+			"GL_CONTROLS_LANDING_PATH": {
+				"type": "string",
+				"value": "internal/adf_prd/CONTROLS/"
+			},
+			"GL_SQL_SERVERNAME": {
+				"type": "string",
+				"value": "az-dna-313-eun-sq-lylsytmxovtglrcgjldo.database.windows.net"
+			},
+			"GL_SQL_DB": {
+				"type": "string",
+				"value": "az-dna-313-eun-sqdb-kvgobntxycpafsqeirdz"
+			},
+			"GL_SQL_USERNAME": {
+				"type": "string",
+				"value": "EDSSQLADMIN"
+			},
+			"GL_ORACLE_HOSTNAME": {
+				"type": "string",
+				"value": "HOUCY1-A-RWSH634P.americas.shell.com"
+			},
+			"GL_ORACLE_PORT": {
+				"type": "string",
+				"value": "1648"
+			},
+			"GL_ORACLE_SERVICE_NAME": {
+				"type": "string",
+				"value": "RWSH634P"
+			},
+			"GL_ORACLE_USERNAME": {
+				"type": "string",
+				"value": "INC_MGMT_READ"
+			},
+			"GL_LAW_BASE_URL": {
+				"type": "string",
+				"value": "https://api.loganalytics.io/v1/workspaces/a6c91029-944a-4d4d-89f2-4aa6e9bcac1c"
+			},
+			"GL_LAW_ENTRA_RESOURCE_ID": {
+				"type": "string",
+				"value": "https://api.loganalytics.io"
+			},
+			"GL_CONTROLS_REPO_PATH": {
+				"type": "string",
+				"value": "/Repos/sede-x-DATTA-CONTROLS/datta-controls/"
+			},
+			"GL_KV_SP_MARS_ACS_TOKEN": {
+				"type": "string",
+				"value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/MARS-SP-CLIENT-SECRET/8b711f1e2a9c4cffb0f6e8b26ba3b3a6?api-version=7.0"
+			},
+			"GL_KV_SP_MARS_ClientID": {
+				"type": "string",
+				"value": "https://az-dna-323-eun-kv-tkzjsf.vault.azure.net/secrets/MARS-SP-CLIENT-ID/34720f1c66d24a7a80d50487f39f84c6?api-version=7.0"
+			},
+			"GL_SP_MARS_Resource_ID": {
+				"type": "string",
+				"value": "00000003-0000-0ff1-ce00-000000000000"
+			},
+			"GL_SP_URL": {
+				"type": "string",
+				"value": "eu001-sp.shell.com"
+			},
+			"GL_SP_MARS_Tenant_ID": {
+				"type": "string",
+				"value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+			},
+			"GL_SP_MARS_FOLDERURL2": {
+				"type": "string",
+				"value": "'/sites/UG-DS-ChennaiEUSAOps-MARS/Shared%20Documents/MARS/MARS/PROD/Input%20files%20by%20R&A%20team'"
+			},
+			"GL_SP_MARS_FOLDERURL1": {
+				"type": "string",
+				"value": "'/sites/UG-DS-ChennaiEUSAOps-MARS/Shared%20Documents/MARS/MARS/PROD/Standard%20input%20files'"
+			},
+			"GL_ADLS_MARS_SINK_PATH": {
+				"type": "string",
+				"value": "internal/adf_prd/FS_Usecase_MARS"
+			}
+		}
+	},
+	"location": "North Europe",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "40d7cf7e-6edf-4fcb-92f5-b0360e1565b5",
+		"tenantId": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+	}
+}
