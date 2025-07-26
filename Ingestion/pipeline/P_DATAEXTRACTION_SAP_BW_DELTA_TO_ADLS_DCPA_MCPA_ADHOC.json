@@ -1,0 +1,137 @@
+{
+	"name": "P_DATAEXTRACTION_SAP_BW_DELTA_TO_ADLS_DCPA_MCPA_ADHOC",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup Data from Databricks DeltaLake Table",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureDatabricksDeltaLakeSource",
+						"query": {
+							"value": "@concat('select * from `',pipeline().globalParameters.GL_CONFIG_CATALOG_NAME,'`.`',pipeline().globalParameters.GL_CONFIG_SCHEMA_NAME,'`.`',pipeline().globalParameters.GL_CONFIG_TABLE_NAME,'` where table_classification = \"T\" and project_name = \"MCPA_DCPA\" and process_name=\"EXTRACT_SAP_BW\" and load_type = \"DELTA_LOAD\" and schema_name = \"D\" and table_name = \"ZOH_COLDP\" ')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_ADB_DELTALAKE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Databricks_Workspace_URL": {
+								"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+								"type": "Expression"
+							},
+							"Cluster_id": {
+								"value": "@pipeline().globalParameters.GL_CLUSTER_ID",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup Data from Databricks DeltaLake Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup Data from Databricks DeltaLake Table').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data from SAP to ADLS",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SapOpenHubSource",
+									"excludeLastRequest": false
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_GSAP_BW",
+									"type": "DatasetReference",
+									"parameters": {
+										"BW_Table_Name": {
+											"value": "@item().table_name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_LANDING",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().TABLE_NAME,'_', formatDateTime(convertTimeZone(utcnow(),'UTC', 'India standard Time'),'yyyyMMdd_HHmmss'),'_','001','.parquet')",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@item().target_path",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "GSAP BW"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-07-24T09:23:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

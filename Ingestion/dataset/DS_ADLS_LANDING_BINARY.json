@@ -1,0 +1,36 @@
+{
+	"name": "DS_ADLS_LANDING_BINARY",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_LANDING",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"File_Name": {
+				"type": "string"
+			},
+			"Folder_Name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().File_Name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().Folder_Name",
+					"type": "Expression"
+				},
+				"fileSystem": "landing"
+			}
+		}
+	}
+}

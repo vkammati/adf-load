@@ -1,0 +1,25 @@
+{
+	"name": "LS_GSAP_BW",
+	"properties": {
+		"annotations": [],
+		"type": "SapOpenHub",
+		"typeProperties": {
+			"clientId": "110",
+			"userName": "R_ADF_EDS",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "AZ-AS-DATTA-ADF-BW-PASSWORD"
+			},
+			"server": "sapdcd4.europe.shell.com",
+			"systemNumber": "04"
+		},
+		"connectVia": {
+			"referenceName": "DATTA-SHIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

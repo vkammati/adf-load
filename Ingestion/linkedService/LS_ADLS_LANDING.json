@@ -1,0 +1,10 @@
+{
+	"name": "LS_ADLS_LANDING",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://azdna312eunadlslifwiyswa.dfs.core.windows.net/"
+		}
+	}
+}

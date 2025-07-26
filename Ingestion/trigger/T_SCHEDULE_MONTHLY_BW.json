@@ -1,0 +1,38 @@
+{
+	"name": "T_SCHEDULE_MONTHLY_BW",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_DATAEXTRACTION_SAP_HANA_TO_ADLS_MASTER_MONTHLY",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Month",
+				"interval": 1,
+				"startTime": "2024-07-11T10:46:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						2
+					],
+					"monthlyOccurrences": [
+						{
+							"day": "Monday",
+							"occurrence": 1
+						}
+					]
+				}
+			}
+		}
+	}
+}

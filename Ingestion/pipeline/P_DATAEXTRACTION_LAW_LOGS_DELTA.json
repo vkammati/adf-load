@@ -1,0 +1,694 @@
+{
+	"name": "P_DATAEXTRACTION_LAW_LOGS_DELTA",
+	"properties": {
+		"activities": [
+			{
+				"name": "copy ADLS_LOGS_",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "POST",
+						"requestBody": {
+							"value": "@concat('{\n    \"query\": \"StorageBlobLogs  | where TimeGenerated >= todatetime(\\\"2024-11-25 15:59:59.739063\\\")',' and not     (Uri contains \\\"change_data\\\" or Uri contains \\\"_delta_log\\\" or Uri contains \\\"deletion_vector\\\" or Uri contains \\\"_enzyme_log\\\") and OperationName contains \\\"Delete\\\"  |project TimeGenerated, AccountName,OperationName,StatusText,Uri,CallerIpAddress,CorrelationId,RequesterObjectId,RequesterTenantId,AuthorizationDetails,_ResourceId\"\n}\n')",
+							"type": "Expression"
+						},
+						"additionalHeaders": {
+							"content-type": "application/json; charset=utf-8"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['rows']"
+								},
+								"sink": {
+									"name": "RequesterObjectId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['tables']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_LAW",
+						"type": "DatasetReference",
+						"parameters": {
+							"Law_Base_URL": {
+								"value": "@pipeline().globalParameters.GL_LAW_BASE_URL",
+								"type": "Expression"
+							},
+							"Law_Entra_ResourceID": {
+								"value": "@pipeline().globalParameters.GL_LAW_ENTRA_RESOURCE_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": {
+								"value": "@concat('ADLS_LOGS_',utcNow(),'.parquet')",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat(pipeline().globalParameters.GL_CONTROLS_LANDING_PATH,'/ADLS_LOGS')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "COPY_UC_LOGS",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "POST",
+						"requestBody": {
+							"value": "@concat('{\n    \"query\": \"DatabricksUnityCatalog  | where TimeGenerated between (datetime(',startOfDay(adddays(utcNow(),-1)),') .. datetime(',startOfDay(utcNow()),'))',' and  OperationName contains \\\"Delete\\\" or OperationName contains \\\"Update\\\" |project TimeGenerated, ActionName,OperationName,Category,Type,SourceSystem,Identity,Response,RequestParams,_ResourceId,RequestId,SourceIPAddress,LogId, UserAgent,TenantId\"\n}\n')",
+							"type": "Expression"
+						},
+						"additionalHeaders": {
+							"content-type": "application/json; charset=utf-8"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['rows']"
+								},
+								"sink": {
+									"name": "RequesterObjectId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['tables']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_LAW",
+						"type": "DatasetReference",
+						"parameters": {
+							"Law_Base_URL": {
+								"value": "@pipeline().globalParameters.GL_LAW_BASE_URL",
+								"type": "Expression"
+							},
+							"Law_Entra_ResourceID": {
+								"value": "@pipeline().globalParameters.GL_LAW_ENTRA_RESOURCE_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": {
+								"value": "@concat('UC_LOGS_',utcNow(),'.parquet')",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat(pipeline().globalParameters.GL_CONTROLS_LANDING_PATH,'/UC_LOGS')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "COPY_Notebook_LOGS",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "POST",
+						"requestBody": {
+							"value": "@concat('{\n    \"query\": \"DatabricksNotebook  | where TimeGenerated between (datetime(',startOfDay(adddays(utcNow(),-1)),') .. datetime(',startOfDay(utcNow()),'))',' and  OperationName contains \\\"Delete\\\" |project TimeGenerated, ActionName,OperationName,Category,Type,SourceSystem,Identity,Response,RequestParams,_ResourceId,RequestId,SourceIPAddress,LogId, UserAgent,TenantId\"\n}\n')",
+							"type": "Expression"
+						},
+						"additionalHeaders": {
+							"content-type": "application/json; charset=utf-8"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['rows']"
+								},
+								"sink": {
+									"name": "RequesterObjectId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['tables']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_LAW",
+						"type": "DatasetReference",
+						"parameters": {
+							"Law_Base_URL": {
+								"value": "@pipeline().globalParameters.GL_LAW_BASE_URL",
+								"type": "Expression"
+							},
+							"Law_Entra_ResourceID": {
+								"value": "@pipeline().globalParameters.GL_LAW_ENTRA_RESOURCE_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": {
+								"value": "@concat('DBX_NOTEBOOK_LOGS_',utcNow(),'.parquet')",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat(pipeline().globalParameters.GL_CONTROLS_LANDING_PATH,'/DBX_NOTEBOOK_LOGS')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "COPY_KV_LOGS",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "POST",
+						"requestBody": {
+							"value": "@concat('{\n    \"query\": \"AzureDiagnostics  | where TimeGenerated between (datetime(',startOfDay(adddays(utcNow(),-1)),') .. datetime(',startOfDay(utcNow()),'))',' and  (OperationName contains \\\"delete\\\" or OperationName contains \\\"put\\\" or OperationName contains \\\"import\\\" or OperationName contains \\\"change\\\" or OperationName contains \\\"update\\\") |project TimeGenerated,OperationName,Category,Type,SourceSystem,_ResourceId,   TenantId,ResourceGroup,Resource,ResourceType,ResourceId,ResultType,ResultDescription,requestUri_s,identity_claim_http_schemas_xmlsoap_org_ws_2005_05_identity_claims_name_s,identity_claim_http_schemas_xmlsoap_org_ws_2005_05_identity_claims_upn_s,removedAccessPolicy_ObjectId_g,SubscriptionId\"\n}\n')",
+							"type": "Expression"
+						},
+						"additionalHeaders": {
+							"content-type": "application/json; charset=utf-8"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['rows']"
+								},
+								"sink": {
+									"name": "RequesterObjectId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['tables']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_LAW",
+						"type": "DatasetReference",
+						"parameters": {
+							"Law_Base_URL": {
+								"value": "@pipeline().globalParameters.GL_LAW_BASE_URL",
+								"type": "Expression"
+							},
+							"Law_Entra_ResourceID": {
+								"value": "@pipeline().globalParameters.GL_LAW_ENTRA_RESOURCE_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": {
+								"value": "@concat('KV_LOGS_',utcNow(),'.parquet')",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat(pipeline().globalParameters.GL_CONTROLS_LANDING_PATH,'/KV_LOGS')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "COPY_Cluster_LOGS",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "POST",
+						"requestBody": {
+							"value": "@concat('{\n    \"query\": \"DatabricksClusters  | where TimeGenerated between (datetime(',startOfDay(adddays(utcNow(),-1)),') .. datetime(',startOfDay(utcNow()),'))',' |project TimeGenerated, ActionName,OperationName,Category,Type,SourceSystem,Identity,Response,RequestParams,_ResourceId,RequestId,SourceIPAddress,LogId, UserAgent,TenantId\"\n}\n')",
+							"type": "Expression"
+						},
+						"additionalHeaders": {
+							"content-type": "application/json; charset=utf-8"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['rows']"
+								},
+								"sink": {
+									"name": "RequesterObjectId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['tables']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_LAW",
+						"type": "DatasetReference",
+						"parameters": {
+							"Law_Base_URL": {
+								"value": "@pipeline().globalParameters.GL_LAW_BASE_URL",
+								"type": "Expression"
+							},
+							"Law_Entra_ResourceID": {
+								"value": "@pipeline().globalParameters.GL_LAW_ENTRA_RESOURCE_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": {
+								"value": "@concat('CLUSTER_LOGS_',utcNow(),'.parquet')",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat(pipeline().globalParameters.GL_CONTROLS_LANDING_PATH,'/CLUSTER_LOGS')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "COPY_WORKSPACE_LOGS",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "POST",
+						"requestBody": {
+							"value": "@concat('{\n    \"query\": \"DatabricksWorkspace  | where TimeGenerated between (datetime(',startOfDay(adddays(utcNow(),-1)),') .. datetime(',startOfDay(utcNow()),'))',' |project TimeGenerated, ActionName,OperationName,Category,Type,SourceSystem,Identity,Response,RequestParams,_ResourceId,RequestId,SourceIPAddress,LogId, UserAgent,TenantId\"\n}\n')",
+							"type": "Expression"
+						},
+						"additionalHeaders": {
+							"content-type": "application/json; charset=utf-8"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['rows']"
+								},
+								"sink": {
+									"name": "RequesterObjectId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['tables']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_LAW",
+						"type": "DatasetReference",
+						"parameters": {
+							"Law_Base_URL": {
+								"value": "@pipeline().globalParameters.GL_LAW_BASE_URL",
+								"type": "Expression"
+							},
+							"Law_Entra_ResourceID": {
+								"value": "@pipeline().globalParameters.GL_LAW_ENTRA_RESOURCE_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": {
+								"value": "@concat('WORKSPACE_LOGS_',utcNow(),'.parquet')",
+								"type": "Expression"
+							},
+							"Folder_Name": {
+								"value": "@concat(pipeline().globalParameters.GL_CONTROLS_LANDING_PATH,'/WORKSPACE_LOGS')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Lookup_ProcessConfig_Table",
+				"description": "Reading Water Mark Table to get the LAST_DTM.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureDatabricksDeltaLakeSource",
+						"query": {
+							"value": "@concat('select * from `',pipeline().globalParameters.GL_CONFIG_CATALOG_NAME,'`.`',pipeline().globalParameters.GL_CONFIG_SCHEMA_NAME,'`.`',pipeline().globalParameters.GL_CONFIG_TABLE_NAME,'` where source_system = \"LAW\" and table_classification in (\"C\") and frequency = \"D\" and load_type = \"DELTA_LOAD_CONTROLS\" and active_flag = \"X\" ')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_ADB_DELTALAKE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Databricks_Workspace_URL": {
+								"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+								"type": "Expression"
+							},
+							"Cluster_id": {
+								"value": "@pipeline().globalParameters.GL_CLUSTER_ID",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_Table",
+				"description": "Iterate to get the Table Name and Target path from Watermark Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_ProcessConfig_Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_ProcessConfig_Table').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "copy LAW_LOGS",
+							"description": "Extracting Delta Data from SAP Hana ",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "POST",
+									"requestBody": {
+										"value": "@concat('{\n    \"query\": \" ',item().schema_name,  ' | where TimeGenerated >= todatetime(\\\"',item().last_dtm,'\\\") ',item().source_query,'\"\n}\n')",
+										"type": "Expression"
+									},
+									"additionalHeaders": {
+										"content-type": "application/json; charset=utf-8"
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings",
+										"copyBehavior": "FlattenHierarchy"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['rows']"
+											},
+											"sink": {
+												"name": "RequesterObjectId",
+												"type": "String"
+											}
+										}
+									],
+									"collectionReference": "$['tables']",
+									"mapComplexValuesToString": true
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_LAW",
+									"type": "DatasetReference",
+									"parameters": {
+										"Law_Base_URL": {
+											"value": "@pipeline().globalParameters.GL_CONTROLS_LAW_BASE_URL",
+											"type": "Expression"
+										},
+										"Law_Entra_ResourceID": {
+											"value": "@pipeline().globalParameters.GL_CONTROLS_LAW_ENTRA_RESOURCE_ID",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_LANDING",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().table_name,'_',utcNow(),'.parquet')",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@concat(item().target_path)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,249 @@
+{
+	"name": "az-dna-313-eun-adf-igypoplozigtctsxofcu",
+	"properties": {
+		"globalParameters": {
+			"GL_CONFIG_CATALOG_NAME": {
+				"type": "string",
+				"value": "cross_ds-unitycatalog-dev"
+			},
+			"GL_CONFIG_TABLE_NAME": {
+				"type": "string",
+				"value": "load_process_config"
+			},
+			"GL_ENV": {
+				"type": "string",
+				"value": "dev"
+			},
+			"GL_UNIQUE_REPO_BRANCH_ID": {
+				"type": "string",
+				"value": "datta"
+			},
+			"GL_REPOS_PATH": {
+				"type": "string",
+				"value": "/Repos/DATTA-FCB_CC_UOM_BW_Final/DATTA-FCB_CC_UOM_Final/"
+			},
+			"GL_DATABRICKS_URL": {
+				"type": "string",
+				"value": "https://adb-695426772332595.15.azuredatabricks.net"
+			},
+			"GL_CLUSTER_ID": {
+				"type": "string",
+				"value": "0628-120324-4oeeevac"
+			},
+			"GL_MINERVA_REPOS_PATH_FI": {
+				"type": "string",
+				"value": "/Repos/DATTA-WS-MIGRATION/DATTA-FI-EUH/"
+			},
+			"GL_MINERVA_REPOS_PATH_MASTER": {
+				"type": "string",
+				"value": "/Repos/DATTA-WS-MIGRATION/DATTA-MD-ATTR-EUH/"
+			},
+			"GL_KV_SP_FALCONLITE_ClIENTID": {
+				"type": "string",
+				"value": "https://az-dna-313-eun-kv-trqgoc.vault.azure.net/secrets/FALCONLITE-SP-CLIENT-ID/7b41fb5caa7d4bf19011867c11f1e034?api-version=7.0"
+			},
+			"GL_KV_SP_FALCONLITE_ACS_TOKEN": {
+				"type": "string",
+				"value": "https://az-dna-313-eun-kv-trqgoc.vault.azure.net/secrets/FALCONLITE-SP-CLIENT-SECRET/8bbedbcf2e2f45e09bb57adf2457d86e?api-version=7.0"
+			},
+			"GL_SP_FALCONLITE_TENANT_ID": {
+				"type": "string",
+				"value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+			},
+			"GL_SP_FALCONLITE_RESOURCE_ID": {
+				"type": "string",
+				"value": "00000003-0000-0ff1-ce00-000000000000"
+			},
+			"GL_CONTROLS_LANDING_PATH": {
+				"type": "string",
+				"value": "internal/adf_dev/CONTROLS/"
+			},
+			"GL_SQL_SERVERNAME": {
+				"type": "string",
+				"value": "az-dna-313-eun-sq-lylsytmxovtglrcgjldo.database.windows.net"
+			},
+			"GL_SQL_DB": {
+				"type": "string",
+				"value": "az-dna-313-eun-sqdb-kvgobntxycpafsqeirdz"
+			},
+			"GL_SQL_USERNAME": {
+				"type": "string",
+				"value": "EDSSQLADMIN"
+			},
+			"GL_CONTROLS_ORACLE_HOSTNAME": {
+				"type": "string",
+				"value": "AENPL03710ASDO1.linux.shell.com"
+			},
+			"GL_CONTROLS_ORACLE_PORT": {
+				"type": "string",
+				"value": "1648"
+			},
+			"GL_CONTROLS_ORACLE_SERVICE_NAME": {
+				"type": "string",
+				"value": "RWSH634P_SRV"
+			},
+			"GL_CONTROLS_ORACLE_USERNAME": {
+				"type": "string",
+				"value": "INC_MGMT_READ"
+			},
+			"GL_CONTROLS_LAW_BASE_URL": {
+				"type": "string",
+				"value": "https://api.loganalytics.io/v1/workspaces/9d70f54e-bdba-494c-94bf-71eaabeafd12"
+			},
+			"GL_CONTROLS_LAW_ENTRA_RESOURCE_ID": {
+				"type": "string",
+				"value": "https://api.loganalytics.io"
+			},
+			"GL_KV_SP_MARS_ACS_TOKEN": {
+				"type": "string",
+				"value": "https://az-dna-313-eun-kv-trqgoc.vault.azure.net/secrets/MARS-SP-CLIENT-SECRET/842a4ddafa374ab2a847d6a428b71071?api-version=7.0"
+			},
+			"GL_KV_SP_MARS_CLIENTID": {
+				"type": "string",
+				"value": "https://az-dna-313-eun-kv-trqgoc.vault.azure.net/secrets/MARS-SP-CLIENT-ID/e0a81412344d41729a64e9135290afcb?api-version=7.0"
+			},
+			"GL_SP_MARS_RESOURCE_ID": {
+				"type": "string",
+				"value": "00000003-0000-0ff1-ce00-000000000000"
+			},
+			"GL_SP_URL": {
+				"type": "string",
+				"value": "eu001-sp.shell.com"
+			},
+			"GL_SP_FALCONLITE_FOLDER_URL": {
+				"type": "string",
+				"value": "https://eu001-sp.shell.com/sites/AAFAA6687/_api/web/GetFolderByServerRelativeUrl('/sites/AAFAA6687/Shared Documents/Documents/Downstream/Lubes/DR IT Documents/Falcon Lite Mapping File Monthly Update/MANUAL_FEED_DEV/')/Files"
+			},
+			"GL_SP_MARS_TENANT_ID": {
+				"type": "string",
+				"value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+			},
+			"GL_SP_MARS_FOLDERURL2": {
+				"type": "string",
+				"value": "'/sites/UG-DS-ChennaiEUSAOps-MARS/Shared%20Documents/MARS/MARS/DEV/Input%20files%20by%20R&A%20team'"
+			},
+			"GL_SP_MARS_FOLDERURL1": {
+				"type": "string",
+				"value": "'/sites/UG-DS-ChennaiEUSAOps-MARS/Shared%20Documents/MARS/MARS/DEV/Standard%20input%20files'"
+			},
+			"GL_ADLS_MARS_SINK_PATH": {
+				"type": "string",
+				"value": "internal/adf_dev/FS_Usecase_MARS"
+			},
+			"GL_CONFIG_SCHEMA_NAME": {
+				"type": "string",
+				"value": "raw-ds"
+			},
+			"GL_SHAREPOINT_CONFIG_TABLE_NAME": {
+				"type": "string",
+				"value": "sharepoint_process_config"
+			},
+			"GL_CERES_DELTALAKE_EXTERNAL_PATH": {
+				"type": "string",
+				"value": "curated/ceres_dev/"
+			},
+			"GL_REPOS_PATH_CERES_CURATED": {
+				"type": "string",
+				"value": "/Repos/DATTA-WS-MIGRATION/DATTA-CERES-CURATED/"
+			},
+			"GL_CERES_BASE_INBOUND_URL": {
+				"type": "string",
+				"value": "https://test.vta-biofuels.de/api/shell/movements/inbound"
+			},
+			"GL_CERES_BASE_OUTBOUND_URL": {
+				"type": "string",
+				"value": "https://test.vta-biofuels.de/api/shell/movements/outbound"
+			},
+			"GL_CERES_INBOUND_TOKEN": {
+				"type": "string",
+				"value": "https://test.vta-biofuels.de/api/auth/token"
+			},
+			"GL_CERES_INBOUND_CLIENT_ID": {
+				"type": "string",
+				"value": "shell_nl"
+			},
+			"GL_CERES_INBOUND_CLIENT_SECRET": {
+				"type": "string",
+				"value": "CERES-CLIENTSECRET"
+			},
+			"GL_DATABRICKS_SUBSCRIPTIONS": {
+				"type": "string",
+				"value": "0e1845e1-8254-4871-b1ad-f54f710c3647"
+			},
+			"GL_DATABRICKS_RESOURCEGROUPS": {
+				"type": "string",
+				"value": "az-dna-313-rg-tworxbyhuhqvhynpxayi"
+			},
+			"GL_DATABRICKS_WORKSPACE": {
+				"type": "string",
+				"value": "az-dna-313-eun-adb-tjfyjoqlkhe"
+			},
+			"GL_CERES_OUTBOUND_TOKEN": {
+				"type": "string",
+				"value": "https://test.vta-biofuels.de/api/auth/token"
+			},
+			"GL_CERES_OUTBOUND_CLIENT_ID": {
+				"type": "string",
+				"value": "shell_nl"
+			},
+			"GL_CERES_OUTBOUND_CLIENT_SECRET": {
+				"type": "string",
+				"value": "CERES-CLIENTSECRET"
+			},
+			"GL_KV_SP_CONTROLS_CLIENTID": {
+				"type": "string",
+				"value": "https://az-dna-313-eun-kv-trqgoc.vault.azure.net/secrets/AZ-AS-DATTA-CONTROLS-SP-CLIENT-ID/207e9f5032064c2ab913d35d8e5e1c53?api-version=7.0"
+			},
+			"GL_KV_SP_CONTROLS_ACS_TOKEN": {
+				"type": "string",
+				"value": "https://az-dna-313-eun-kv-trqgoc.vault.azure.net/secrets/AZ-AS-DATTA-CONTROLS-SP-CLIENT-SECRET/cc4ff62386f44096b4f084a0cba31a14?api-version=7.0"
+			},
+			"GL_SP_CONTROLS_TENANT_ID": {
+				"type": "string",
+				"value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+			},
+			"GL_SP_CONTROLS_RESOURCE_ID": {
+				"type": "string",
+				"value": "00000003-0000-0ff1-ce00-000000000000"
+			},
+			"GL_SP_CONTROLS_FOLDER_URL_AAD_LOG": {
+				"type": "string",
+				"value": "https://eu001-sp.shell.com/sites/AAAAA2150/_api/web/GetFolderByServerRelativeUrl('/sites/AAAAA2150/Documents/EDPL for DS/Project Management/SG3. Executing/DATTA/Security/EDS DS Subscription Controls/Controls Automation/AAD change logs/')/Files"
+			},
+			"GL_TECH_EH_REPO_PATH": {
+				"type": "string",
+				"value": "/Repos/DATTA-AUTO_TRIGGER_CAPABILITY/DATTA-TECH-EH/"
+			},
+			"GL_ADF_TRIGGER_API": {
+				"type": "string",
+				"value": "https://management.azure.com/subscriptions/0e1845e1-8254-4871-b1ad-f54f710c3647/resourceGroups/az-dna-313-rg-tirtamrslwqvryriayyj/providers/Microsoft.DataFactory/factories/az-dna-313-eun-adf-igypoplozigtctsxofcu/"
+			},
+			"GL_AZ_AS_SPN_DATTA_WDS_CLIENT_ID": {
+				"type": "string",
+				"value": "0d5e6410-b2ef-4729-9853-ea84a5bfa226"
+			},
+			"GL_AZ_AS_SPN_DATTA_WDS_TENANT_ID": {
+				"type": "string",
+				"value": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+			},
+			"GL_COPA_JOB_ID_EUH_D": {
+				"type": "string",
+				"value": "635866782438602"
+			},
+			"GL_COPA_JOB_ID_EUH_M": {
+				"type": "string",
+				"value": "534764615030605"
+			},
+			"GL_FALCONLITE_JOB_ID": {
+				"type": "string",
+				"value": "650673780900798"
+			}
+		}
+	},
+	"location": "North Europe",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "c93f8494-dd2b-41da-8154-2f05c3b4ef8e",
+		"tenantId": "db1e96a8-a3da-442a-930b-235cac24cd5c"
+	}
+}

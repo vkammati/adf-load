@@ -1,0 +1,41 @@
+{
+	"name": "LS_DATABRICKS",
+	"properties": {
+		"parameters": {
+			"Databricks_Workspace_URL": {
+				"type": "string",
+				"defaultValue": "https://adb-695426772332595.15.azuredatabricks.net"
+			}
+		},
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "@linkedService().Databricks_Workspace_URL",
+			"accessToken": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "DB-PAT-TOKEN-NEW"
+			},
+			"newClusterNodeType": "Standard_D4ds_v5",
+			"newClusterNumOfWorker": "2",
+			"newClusterSparkConf": {
+				"spark.databricks.delta.preview.enabled": "true"
+			},
+			"newClusterSparkEnvVars": {
+				"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+			},
+			"newClusterCustomTags": {
+				"Environment": "dev",
+				"Name": "DATTA-ADF-JC"
+			},
+			"newClusterVersion": "15.4.x-scala2.12",
+			"clusterOption": "Fixed",
+			"newClusterInitScripts": [],
+			"dataSecurityMode": "USER_ISOLATION"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

@@ -1,0 +1,52 @@
+{
+	"name": "DS_CONTROLS_SHAREPOINT_EXCEL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SHAREPOINT_CONTROLS",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"RelativeURL": {
+					"value": "@dataset().RelativeURL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"RelativeURL": {
+				"type": "string"
+			},
+			"SheetName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": {
+				"value": "@dataset().SheetName",
+				"type": "Expression"
+			},
+			"location": {
+				"type": "HttpServerLocation"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "Functional Area",
+				"type": "String"
+			},
+			{
+				"name": "Name",
+				"type": "String"
+			},
+			{
+				"name": "FA Grouping",
+				"type": "String"
+			}
+		]
+	}
+}

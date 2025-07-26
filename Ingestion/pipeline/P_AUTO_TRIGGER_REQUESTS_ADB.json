@@ -1,0 +1,166 @@
+{
+	"name": "P_AUTO_TRIGGER_REQUESTS_ADB",
+	"properties": {
+		"description": "This pipeline will do automated trigger requests for ADF pipelines.",
+		"activities": [
+			{
+				"name": "ADB_LOOKUP_TRIGGER_DETAILS",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@concat(pipeline().globalParameters.GL_TECH_EH_REPO_PATH, 'datta_tech_eh/Automated_Trigger_Workday_Solution_ADB')",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"Databricks_Workspace_URL": {
+							"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+							"type": "Expression"
+						},
+						"env": {
+							"value": "@pipeline().globalParameters.GL_ENV",
+							"type": "Expression"
+						},
+						"unique_repo_branch_id": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						},
+						"unique_repo_branch_id_schema": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						},
+						"Tech_EH_Repo_Path": {
+							"value": "@pipeline().globalParameters.GL_TECH_EH_REPO_PATH",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_DATABRICKS",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"Databricks_Workspace_URL": {
+							"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "ADB_FOREACH_TRIGGER",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ADB_LOOKUP_TRIGGER_DETAILS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('ADB_LOOKUP_TRIGGER_DETAILS').output.runOutput",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@empty(activity('ADB_LOOKUP_TRIGGER_DETAILS').output.runOutput)",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "ADB_FORAECH_WAIT",
+										"type": "Wait",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"waitTimeInSeconds": {
+												"value": "@item().WaitTime",
+												"type": "Expression"
+											}
+										}
+									},
+									{
+										"name": "ADB_FORAECH_WEB_TRIGGER",
+										"description": "This activity will trigger the pipelines in this IngestionADB once the wait is over",
+										"type": "WebActivity",
+										"dependsOn": [
+											{
+												"activity": "ADB_FORAECH_WAIT",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.00:10:00",
+											"retry": 3,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"method": "POST",
+											"url": {
+												"value": "@concat(pipeline().globalParameters.GL_DATABRICKS_URL,'/api/2.1/jobs/run-now')",
+												"type": "Expression"
+											},
+											"body": {
+												"value": "@concat('{\"job_id\":',item().JobID,'}')",
+												"type": "Expression"
+											},
+											"authentication": {
+												"type": "ServicePrincipal",
+												"userTenant": {
+													"value": "@pipeline().globalParameters.GL_AZ_AS_SPN_DATTA_WDS_TENANT_ID",
+													"type": "Expression"
+												},
+												"username": {
+													"value": "@pipeline().globalParameters.GL_AZ_AS_SPN_DATTA_WDS_CLIENT_ID",
+													"type": "Expression"
+												},
+												"resource": "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d",
+												"password": {
+													"type": "AzureKeyVaultSecret",
+													"store": {
+														"referenceName": "LS_KEYVAULT_DATTA",
+														"type": "LinkedServiceReference"
+													},
+													"secretName": "AZ-AS-SPN-DATTA-WDS-CLIENT-SECRET"
+												}
+											}
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "AUTO_WORKDAY_TRIGGERS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-02-26T12:05:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

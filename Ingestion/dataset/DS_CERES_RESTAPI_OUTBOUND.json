@@ -1,0 +1,47 @@
+{
+	"name": "DS_CERES_RESTAPI_OUTBOUND",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_CERES_RESTAPI_OUTBOUND",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"CERES_BASE_OUTBOUND_URL": {
+					"value": "@dataset().DS_CERES_BASE_OUTBOUND_URL",
+					"type": "Expression"
+				},
+				"CERES_OUTBOUND_TOKEN": {
+					"value": "@dataset().DS_CERES_OUTBOUND_TOKEN",
+					"type": "Expression"
+				},
+				"CERES_OUTBOUND_CLIEND_ID": {
+					"value": "@dataset().DS_CERES_OUTBOUND_CLIENT_ID",
+					"type": "Expression"
+				},
+				"CERES_OUTBOUND_CLIENT_SECRET": {
+					"value": "@dataset().DS_CERES_OUTBOUND_CLIENT_SECRET",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DS_CERES_BASE_OUTBOUND_URL": {
+				"type": "String"
+			},
+			"DS_CERES_OUTBOUND_TOKEN": {
+				"type": "String"
+			},
+			"DS_CERES_OUTBOUND_CLIENT_ID": {
+				"type": "String"
+			},
+			"DS_CERES_OUTBOUND_CLIENT_SECRET": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "CERES"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}

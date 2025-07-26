@@ -1,0 +1,37 @@
+{
+	"name": "DS_ADB_DELTALAKE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADB_DELTALAKE",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Databricks_Workspace_URL": {
+					"value": "@dataset().Databricks_Workspace_URL",
+					"type": "Expression"
+				},
+				"Cluster_id": {
+					"value": "@dataset().Cluster_id",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Databricks_Workspace_URL": {
+				"type": "string"
+			},
+			"Cluster_id": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "DATA INGESTION"
+		},
+		"annotations": [],
+		"type": "AzureDatabricksDeltaLakeDataset",
+		"typeProperties": {
+			"database": "datta"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

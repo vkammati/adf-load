@@ -1,0 +1,39 @@
+{
+	"name": "LS_CERES_RESTAPI_OUTBOUND",
+	"properties": {
+		"parameters": {
+			"CERES_BASE_OUTBOUND_URL": {
+				"type": "String"
+			},
+			"CERES_OUTBOUND_TOKEN": {
+				"type": "String"
+			},
+			"CERES_OUTBOUND_CLIEND_ID": {
+				"type": "String"
+			},
+			"CERES_OUTBOUND_CLIENT_SECRET": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "@{linkedService().CERES_BASE_OUTBOUND_URL}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "OAuth2ClientCredential",
+			"clientId": "@{linkedService().CERES_OUTBOUND_CLIEND_ID}",
+			"clientSecret": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().CERES_OUTBOUND_CLIENT_SECRET",
+					"type": "Expression"
+				}
+			},
+			"tokenEndpoint": "@{linkedService().CERES_OUTBOUND_TOKEN}"
+		}
+	}
+}

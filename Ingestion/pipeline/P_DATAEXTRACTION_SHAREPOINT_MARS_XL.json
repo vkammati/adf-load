@@ -1,0 +1,361 @@
+{
+	"name": "P_DATAEXTRACTION_SHAREPOINT_MARS_XL",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Bearer Token",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SP_MARS_ACS_TOKEN",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"Content-type": "application/x-www-form-urlencoded"
+					},
+					"url": {
+						"value": "https://accounts.accesscontrol.windows.net/db1e96a8-a3da-442a-930b-235cac24cd5c/tokens/OAuth/2/",
+						"type": "Expression"
+					},
+					"body": {
+						"value": "@concat('grant_type=client_credentials&client_id=',activity('SP_MARS_ACS_ClientID').output.value,'@',pipeline().globalParameters.GL_SP_MARS_TENANT_ID,'&client_secret=',activity('SP_MARS_ACS_TOKEN').output.value,'&resource=',pipeline().globalParameters.GL_SP_MARS_RESOURCE_ID,'/',pipeline().globalParameters.GL_SP_URL,'@',pipeline().globalParameters.GL_SP_MARS_TENANT_ID)",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "00000003-0000-0ff1-ce00-000000000000"
+					}
+				}
+			},
+			{
+				"name": "GetSPFolder1Metadata",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get Bearer Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Authorization": {
+							"value": "@concat('Bearer ',activity('Get Bearer Token').output.access_token)",
+							"type": "Expression"
+						},
+						"Accept": "application/json"
+					},
+					"url": {
+						"value": "@concat('https://eu001-sp.shell.com/sites/UG-DS-ChennaiEUSAOps-MARS/_api/web/GetFolderByServerRelativeUrl(',pipeline().globalParameters.GL_SP_MARS_FOLDERURL1,')/Files')\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach1_Folder1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetSPFolder1Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetSPFolder1Metadata').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data from Sharepoint to Landing Layer",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ExcelSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET",
+										"additionalHeaders": {
+											"value": "@concat('Authorization : Bearer ', activity('Get Bearer Token').output.access_token)",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SHAREPOINT_EXCEL",
+									"type": "DatasetReference",
+									"parameters": {
+										"RelativeURL": {
+											"value": "@item().ServerRelativeUrl",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_LANDING",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@{concat(split(item().Name,'.')[0],'.parquet')}",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@pipeline().globalParameters.GL_ADLS_MARS_SINK_PATH",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "GetSPFolder2Metadata",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get Bearer Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Authorization": {
+							"value": "@concat('Bearer ',activity('Get Bearer Token').output.access_token)",
+							"type": "Expression"
+						},
+						"Accept": "application/json"
+					},
+					"url": {
+						"value": "@concat('https://eu001-sp.shell.com/sites/UG-DS-ChennaiEUSAOps-MARS/_api/web/GetFolderByServerRelativeUrl(',pipeline().globalParameters.GL_SP_MARS_FOLDERURL2,')/Files')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach1_Folder2",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetSPFolder2Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetSPFolder2Metadata').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data from Sharepoint to Landing Layer_copy1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ExcelSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET",
+										"additionalHeaders": {
+											"value": "@concat('Authorization : Bearer ', activity('Get Bearer Token').output.access_token)",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SHAREPOINT_EXCEL",
+									"type": "DatasetReference",
+									"parameters": {
+										"RelativeURL": "@item().ServerRelativeUrl"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_LANDING",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@{concat(split(item().Name,'.')[0],'.parquet')}",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@pipeline().globalParameters.GL_ADLS_MARS_SINK_PATH",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "SP_MARS_ACS_ClientID",
+				"description": "Get the SharePoint client ID",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": {
+						"value": "@pipeline().globalParameters.GL_KV_SP_MARS_CLIENTID",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SP_MARS_ACS_TOKEN",
+				"description": "Get the SharePoint client ID",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SP_MARS_ACS_ClientID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": {
+						"value": "@pipeline().globalParameters.GL_KV_SP_MARS_ACS_TOKEN",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "DATA INGESTION"
+		},
+		"annotations": []
+	}
+}

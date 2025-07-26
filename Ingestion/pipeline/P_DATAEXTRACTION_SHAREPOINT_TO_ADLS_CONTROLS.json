@@ -1,0 +1,517 @@
+{
+	"name": "P_DATAEXTRACTION_SHAREPOINT_TO_ADLS_CONTROLS",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy SP Files to ADLS",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Process Config",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Process Config').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Copy data from Sharepoint to Landing Layer_copy1_copy1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET",
+										"additionalHeaders": {
+											"value": "@{concat('Authorization : Bearer ', activity('Get Bearer Token').output.access_token)}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_CONTROLS_SHAREPOINT_BINARY",
+									"type": "DatasetReference",
+									"parameters": {
+										"RelativeURL": {
+											"value": "@concat(item().Source_Relative_URL,item().Source_File_Name,'_',formatDateTime(subtractFromTime(utcnow(),pipeline().parameters.Previous_Month,'Month'),'yyyyMM'),item().Source_File_Format)",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_LANDING_BINARY",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().Target_File_Name,'_',formatDateTime(subtractFromTime(utcnow(),pipeline().parameters.Previous_Month,'Month'),'yyyyMM'),'_',formatDateTime(convertTimeZone(utcnow(),'UTC', 'India standard Time'),'yyyyMMdd_HHmmss'),'_','001',item().Target_File_Format)",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@item().Target_File_Path",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Get Process Config",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Assign File Names to Variable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureDatabricksDeltaLakeSource",
+						"query": {
+							"value": "@concat('select * from `',pipeline().globalParameters.GL_CONFIG_CATALOG_NAME,'`.`',pipeline().globalParameters.GL_CONFIG_SCHEMA_NAME,'`.`',pipeline().globalParameters.GL_SHAREPOINT_CONFIG_TABLE_NAME,'`  where Project_Name = \"CONTROLS\" and Source_File_Format = \".csv\" and Source_File_Name in (',substring(variables('SP_FileNames'),0,sub(length(variables('SP_FileNames')),1)),')')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_ADB_DELTALAKE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Databricks_Workspace_URL": {
+								"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+								"type": "Expression"
+							},
+							"Cluster_id": {
+								"value": "@pipeline().globalParameters.GL_CLUSTER_ID",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "SP_Controls_ACS_ClientID",
+				"description": "Get the SharePoint client ID",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": {
+						"value": "@pipeline().globalParameters.GL_KV_SP_CONTROLS_CLIENTID",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "SP_Controls_ACS_TOKEN",
+				"description": "Get the SharePoint client ID",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SP_Controls_ACS_ClientID",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": {
+						"value": "@pipeline().globalParameters.GL_KV_SP_CONTROLS_ACS_TOKEN",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Get Bearer Token",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "SP_Controls_ACS_TOKEN",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"Content-type": "application/x-www-form-urlencoded"
+					},
+					"url": {
+						"value": "https://accounts.accesscontrol.windows.net/db1e96a8-a3da-442a-930b-235cac24cd5c/tokens/OAuth/2/",
+						"type": "Expression"
+					},
+					"body": {
+						"value": "@concat('grant_type=client_credentials&client_id=',activity('SP_Controls_ACS_ClientID').output.value,'@',pipeline().globalParameters.GL_SP_CONTROLS_TENANT_ID,'&client_secret=',activity('SP_Controls_ACS_TOKEN').output.value,'&resource=',pipeline().globalParameters.GL_SP_CONTROLS_RESOURCE_ID,'/',pipeline().globalParameters.GL_SP_URL,'@',pipeline().globalParameters.GL_SP_CONTROLS_TENANT_ID)",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": {
+							"value": "@pipeline().globalParameters.GL_SP_CONTROLS_RESOURCE_ID",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Get SP File Names",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get Bearer Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Authorization": {
+							"value": "@concat('Bearer ',activity('Get Bearer Token').output.access_token)",
+							"type": "Expression"
+						},
+						"Accept": "application/json"
+					},
+					"url": {
+						"value": "@pipeline().globalParameters.GL_SP_CONTROLS_FOLDER_URL_AAD_LOG",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Assign File Names to Variable",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Current Run File",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Current Run File').output.Value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Temp Variable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "TempFileName",
+								"value": {
+									"value": "@concat('''',replace(item().Name,concat('_',formatDateTime(subtractFromTime(utcnow(),pipeline().parameters.Previous_Month,'Month'),'yyyyMM'),'.csv'),''),''',',variables('SP_FileNames'))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Variable for SP File Names",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Temp Variable",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SP_FileNames",
+								"value": {
+									"value": "@variables('TempFileName')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get Current Run File",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get SP File Names",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get SP File Names').output.value",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@endswith(item().Name,concat('_',formatDateTime(subtractFromTime(utcnow(),pipeline().parameters.Previous_Month,'Month'),'yyyyMM'),'.csv'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get Process Config Excel",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Copy SP Files to ADLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureDatabricksDeltaLakeSource",
+						"query": {
+							"value": "@concat('select * from `',pipeline().globalParameters.GL_CONFIG_CATALOG_NAME,'`.`',pipeline().globalParameters.GL_CONFIG_SCHEMA_NAME,'`.`',pipeline().globalParameters.GL_SHAREPOINT_CONFIG_TABLE_NAME,'`  where Project_Name = \"CONTROLS\" and Source_File_Format=\".xlsx\"')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_ADB_DELTALAKE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Databricks_Workspace_URL": {
+								"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+								"type": "Expression"
+							},
+							"Cluster_id": {
+								"value": "@pipeline().globalParameters.GL_CLUSTER_ID",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Copy SP Files to ADLS Excel",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Process Config Excel",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Process Config Excel').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Copy data from Sharepoint to Landing Layer",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ExcelSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET",
+										"additionalHeaders": {
+											"value": "@{concat('Authorization : Bearer ', activity('Get Bearer Token').output.access_token)}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_CONTROLS_SHAREPOINT_EXCEL",
+									"type": "DatasetReference",
+									"parameters": {
+										"RelativeURL": {
+											"value": "@concat(item().Source_Relative_URL,item().Source_File_Name,item().Source_File_Format)",
+											"type": "Expression"
+										},
+										"SheetName": {
+											"value": "@item().Sheet_Name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_LANDING",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().Target_File_Name,item().Target_File_Format)",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@item().Target_File_Path",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"Previous_Month": {
+				"type": "int",
+				"defaultValue": 1
+			}
+		},
+		"variables": {
+			"SP_FileNames": {
+				"type": "String"
+			},
+			"TempFileName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": []
+	}
+}

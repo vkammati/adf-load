@@ -1,0 +1,52 @@
+{
+	"name": "T_SCHEDULE_CERES_DAILY",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_EDS_TO_CERES_INBOUND",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"Creation_Date_From": "yyyy-mm-dd",
+					"Creation_Date_To": "yyyy-mm-dd",
+					"Posting_Date_From": "yyyy-mm-dd",
+					"Posting_Date_To": "yyyy-mm-dd",
+					"Load_Type": "DELTA"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "P_EDS_TO_CERES_OUTBOUND",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"Creation_Date_From": "yyyy-mm-dd",
+					"Creation_Date_To": "yyyy-mm-dd",
+					"Posting_Date_From": "yyyy-mm-dd",
+					"Posting_Date_To": "yyyy-mm-dd",
+					"Load_Type": "DELTA"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2025-01-29T06:56:00",
+				"timeZone": "India Standard Time",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						12
+					]
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"name": "DS_GSAP_BW",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_GSAP_BW",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"BW_Table_Name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "DATA INGESTION"
+		},
+		"annotations": [],
+		"type": "SapOpenHubTable",
+		"schema": [],
+		"typeProperties": {
+			"openHubDestinationName": {
+				"value": "@dataset().BW_Table_Name",
+				"type": "Expression"
+			}
+		}
+	}
+}

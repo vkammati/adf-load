@@ -1,0 +1,46 @@
+{
+	"name": "DS_FALCONLITE_SHAREPOINT_EXCEL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SHAREPOINT_FALCONLITE",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"RelativeURL": {
+					"value": "@dataset().RelativeURL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"RelativeURL": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "DATA INGESTION"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			},
+			"sheetIndex": 0,
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "Functional Area",
+				"type": "String"
+			},
+			{
+				"name": "Name",
+				"type": "String"
+			},
+			{
+				"name": "FA Grouping",
+				"type": "String"
+			}
+		]
+	}
+}

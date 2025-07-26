@@ -1,0 +1,25 @@
+{
+	"name": "T_SCHEDULE_AUTO_TRIGGERS_ADB_HOURLY",
+	"properties": {
+		"description": "This trigger is used to run Auto trigger pipeline every hour at 45 th minute of UTC time for ADB workflows.",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_AUTO_TRIGGER_REQUESTS_ADB",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 1,
+				"startTime": "2025-06-03T06:45:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

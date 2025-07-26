@@ -1,0 +1,22 @@
+{
+	"name": "LS_GSAP_HANA",
+	"properties": {
+		"annotations": [],
+		"type": "SapHana",
+		"typeProperties": {
+			"connectionString": "SERVERNODE=saphddd.europe.shell.com:30415;UID=R_ADF_EDPL",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "AZ-AS-DATTA-ADF-HANA-PASSWORD"
+			}
+		},
+		"connectVia": {
+			"referenceName": "DATTA-SHIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

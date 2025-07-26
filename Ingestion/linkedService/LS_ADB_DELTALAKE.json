@@ -1,0 +1,27 @@
+{
+	"name": "LS_ADB_DELTALAKE",
+	"properties": {
+		"parameters": {
+			"Databricks_Workspace_URL": {
+				"type": "string"
+			},
+			"Cluster_id": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureDatabricksDeltaLake",
+		"typeProperties": {
+			"domain": "@{linkedService().Databricks_Workspace_URL}",
+			"clusterId": "@{linkedService().Cluster_id}",
+			"accessToken": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "DB-PAT-TOKEN-NEW"
+			}
+		}
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"name": "T_SCHEDULE_FALCON_MONTHLY",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_DATAEXTRACTION_SHAREPOINT_TO_ADLS_FALCONLITE_MONTHLY",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"Previous_Month": 1
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Month",
+				"interval": 1,
+				"startTime": "2024-12-02T08:13:00",
+				"timeZone": "India Standard Time",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						5
+					],
+					"monthDays": [
+						11
+					]
+				}
+			}
+		}
+	}
+}

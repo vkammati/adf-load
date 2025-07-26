@@ -1,0 +1,118 @@
+{
+	"name": "DS_CERES_API_JSON",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_LANDING",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "CERES"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "deltalake"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"productNo": {
+					"type": "string"
+				},
+				"productName": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"movementNo": {
+					"type": "string"
+				},
+				"incoterm": {
+					"type": "string"
+				},
+				"loadingDate": {
+					"type": "string"
+				},
+				"deliveryDate": {
+					"type": "string"
+				},
+				"postingDate": {
+					"type": "string"
+				},
+				"loadingLocationNo": {
+					"type": "string"
+				},
+				"loadingLocationName": {
+					"type": "string"
+				},
+				"deliveryLocationNo": {
+					"type": "string"
+				},
+				"deliveryLocationName": {
+					"type": "string"
+				},
+				"balanceGroupName": {
+					"type": "string"
+				},
+				"partnerNo": {
+					"type": "string"
+				},
+				"partnerName": {
+					"type": "string"
+				},
+				"contractNo": {
+					"type": "string"
+				},
+				"quantityPlannedL15": {
+					"type": "integer"
+				},
+				"quantityPlannedKg": {
+					"type": "integer"
+				},
+				"quantityMeasuredL15": {
+					"type": "integer"
+				},
+				"quantityMeasuredKg": {
+					"type": "integer"
+				},
+				"bioContentL15": {
+					"type": "integer"
+				},
+				"modeOfTransport": {
+					"type": "string"
+				},
+				"nominationKey": {
+					"type": "string"
+				},
+				"ticketKeyLoad": {
+					"type": "string"
+				},
+				"materialDocument": {
+					"type": "string"
+				},
+				"bulkShipmentNo": {
+					"type": "string"
+				},
+				"billOfLadingNoLoading": {
+					"type": "string"
+				},
+				"billOfLadingNoDelivery": {
+					"type": "string"
+				},
+				"remark": {
+					"type": "string"
+				},
+				"cancellationMovementNo": {
+					"type": "string"
+				},
+				"shippingReference": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

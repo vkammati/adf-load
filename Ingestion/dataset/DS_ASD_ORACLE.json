@@ -1,0 +1,47 @@
+{
+	"name": "DS_ASD_ORACLE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ASD_ORACLE_DB",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Oracle_HostName": {
+					"value": "@dataset().Oracle_HostName",
+					"type": "Expression"
+				},
+				"Oracle_Port": {
+					"value": "@dataset().Oracle_Port",
+					"type": "Expression"
+				},
+				"Oracle_ServiceName": {
+					"value": "@dataset().Oracle_ServiceName",
+					"type": "Expression"
+				},
+				"Oracle_UserName": {
+					"value": "@dataset().Oracle_UserName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Oracle_HostName": {
+				"type": "string"
+			},
+			"Oracle_Port": {
+				"type": "string"
+			},
+			"Oracle_ServiceName": {
+				"type": "string"
+			},
+			"Oracle_UserName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": []
+	}
+}

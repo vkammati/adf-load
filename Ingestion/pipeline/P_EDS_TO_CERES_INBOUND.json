@@ -1,0 +1,603 @@
+{
+	"name": "P_EDS_TO_CERES_INBOUND",
+	"properties": {
+		"activities": [
+			{
+				"name": "Curated_Delta To ADLS_JSON",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Workflow Dependency Check",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@concat(pipeline().globalParameters.GL_REPOS_PATH_CERES_CURATED,'datta_pipeline_library/transformation/eh_curated/ceres_inbound_json_creation_to_adls')",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"Created_From_Date": {
+							"value": "@pipeline().parameters.Creation_Date_From",
+							"type": "Expression"
+						},
+						"Created_To_Date": {
+							"value": "@pipeline().parameters.Creation_Date_To",
+							"type": "Expression"
+						},
+						"env": {
+							"value": "@pipeline().globalParameters.GL_ENV",
+							"type": "Expression"
+						},
+						"Load_Type": {
+							"value": "@pipeline().parameters.Load_Type",
+							"type": "Expression"
+						},
+						"Ceres_Repo_Path": {
+							"value": "@pipeline().globalParameters.GL_REPOS_PATH_CERES_CURATED",
+							"type": "Expression"
+						},
+						"unique_repo_branch_id": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						},
+						"Posted_From_Date": {
+							"value": "@if(empty(pipeline().parameters.Posting_Date_From), '', pipeline().parameters.Posting_Date_From)",
+							"type": "Expression"
+						},
+						"Posted_To_Date": {
+							"value": "@if(empty(pipeline().parameters.Posting_Date_To), '', pipeline().parameters.Posting_Date_To)",
+							"type": "Expression"
+						},
+						"unique_repo_branch_id_schema": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_DATABRICKS_MI",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"Databricks_Workspace_URL": {
+							"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+							"type": "Expression"
+						},
+						"Workspace_Resource_ID": {
+							"value": "@concat('/subscriptions/',pipeline().globalParameters.GL_DATABRICKS_SUBSCRIPTIONS,'/resourceGroups/',pipeline().globalParameters.GL_DATABRICKS_RESOURCEGROUPS,'/providers/Microsoft.Databricks/workspaces/',pipeline().globalParameters.GL_DATABRICKS_WORKSPACE)",
+							"type": "Expression"
+						},
+						"env": {
+							"value": "@pipeline().globalParameters.GL_ENV",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Get All folders",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "Curated_Delta To ADLS_JSON",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_ADLS_CURATED",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Path": {
+								"value": "@concat(pipeline().globalParameters.GL_CERES_DELTALAKE_EXTERNAL_PATH,'ceres_inbound/')",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"modifiedDatetimeStart": {
+							"value": "@subtractFromTime (utcnow (),2880,'Minute')",
+							"type": "Expression"
+						},
+						"modifiedDatetimeEnd": null,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Get Latest folder",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get All folders",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All folders').output.childItems",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@greater(item().name,variables('Check_date'))",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Set variable1",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "Check_date",
+											"value": {
+												"value": "@item().name",
+												"type": "Expression"
+											}
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get All Files",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "Get Latest folder",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_ADLS_CURATED",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Path": {
+								"value": "@concat(pipeline().globalParameters.GL_CERES_DELTALAKE_EXTERNAL_PATH,'ceres_inbound/',variables('Check_date'))",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Json File Filter",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Json File Filter').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "ADLS JSON To REST API",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"wildcardFolderPath": {
+											"value": "@concat(pipeline().globalParameters.GL_CERES_DELTALAKE_EXTERNAL_PATH,'ceres_inbound/',variables('Check_date'))",
+											"type": "Expression"
+										},
+										"wildcardFileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "RestSink",
+									"httpRequestTimeout": "00:05:00",
+									"requestInterval": 10,
+									"requestMethod": "POST",
+									"writeBatchSize": 10000,
+									"httpCompressionType": "none"
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_CERES_API_JSON",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_CERES_RESTAPI_INBOUND",
+									"type": "DatasetReference",
+									"parameters": {
+										"DS_CERES_BASE_INBOUND_URL": {
+											"value": "@pipeline().globalParameters.GL_CERES_BASE_INBOUND_URL",
+											"type": "Expression"
+										},
+										"DS_CERES_INBOUND_TOKEN": {
+											"value": "@pipeline().globalParameters.GL_CERES_INBOUND_TOKEN",
+											"type": "Expression"
+										},
+										"DS_CERES_INBOUND_CLIENT_ID": {
+											"value": "@pipeline().globalParameters.GL_CERES_INBOUND_CLIENT_ID",
+											"type": "Expression"
+										},
+										"DS_CERES_INBOUND_CLIENT_SECRET": {
+											"value": "@pipeline().globalParameters.GL_CERES_INBOUND_CLIENT_SECRET",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Get All folders delete",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_ADLS_CURATED",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Path": {
+								"value": "@concat(pipeline().globalParameters.GL_CERES_DELTALAKE_EXTERNAL_PATH,'ceres_inbound/')",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"modifiedDatetimeEnd": {
+							"value": "@subtractFromTime (utcnow (),43200,'Minute')",
+							"type": "Expression"
+						},
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
+			},
+			{
+				"name": "ForEach for delete",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get All folders delete",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All folders delete').output.childItems",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Delete more than 30 days file",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "DS_ADLS_CURATED",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Path": {
+											"value": "@concat(pipeline().globalParameters.GL_CERES_DELTALAKE_EXTERNAL_PATH,'ceres_inbound/',item().name)",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Json File Filter",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get All Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All Files').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@and(equals(item().type,'File'),endswith(item().name,'.json'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Workflow Dependency Check",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 1,
+					"retryIntervalInSeconds": 7200,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@concat(pipeline().globalParameters.GL_REPOS_PATH_CERES_CURATED,\n'datta_ceres_curated/workflow_dependency_check')",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"env": {
+							"value": "@pipeline().globalParameters.GL_ENV",
+							"type": "Expression"
+						},
+						"repos_path": {
+							"value": "@pipeline().globalParameters.GL_REPOS_PATH_CERES_CURATED",
+							"type": "Expression"
+						},
+						"unique_repo_branch_id": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						},
+						"unique_repo_branch_id_schema": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_DATABRICKS_MI",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"Databricks_Workspace_URL": {
+							"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+							"type": "Expression"
+						},
+						"Workspace_Resource_ID": {
+							"value": "@concat('/subscriptions/',pipeline().globalParameters.GL_DATABRICKS_SUBSCRIPTIONS,'/resourceGroups/',pipeline().globalParameters.GL_DATABRICKS_RESOURCEGROUPS,'/providers/Microsoft.Databricks/workspaces/',pipeline().globalParameters.GL_DATABRICKS_WORKSPACE)",
+							"type": "Expression"
+						},
+						"env": {
+							"value": "@pipeline().globalParameters.GL_ENV",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Update Last Run Date",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ForEach for delete",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@concat(pipeline().globalParameters.GL_REPOS_PATH_CERES_CURATED,'datta_pipeline_library/transformation/eh_curated/ceres_update_last_run_date')",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"env": {
+							"value": "@pipeline().globalParameters.GL_ENV",
+							"type": "Expression"
+						},
+						"Load_Type": {
+							"value": "@pipeline().parameters.Load_Type",
+							"type": "Expression"
+						},
+						"Ceres_Repo_Path": {
+							"value": "@pipeline().globalParameters.GL_REPOS_PATH_CERES_CURATED",
+							"type": "Expression"
+						},
+						"unique_repo_branch_id": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						},
+						"API_Type": "INBOUND",
+						"unique_repo_branch_id_schema": {
+							"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_DATABRICKS_MI",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"Databricks_Workspace_URL": {
+							"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+							"type": "Expression"
+						},
+						"Workspace_Resource_ID": {
+							"value": "@concat('/subscriptions/',pipeline().globalParameters.GL_DATABRICKS_SUBSCRIPTIONS,'/resourceGroups/',pipeline().globalParameters.GL_DATABRICKS_RESOURCEGROUPS,'/providers/Microsoft.Databricks/workspaces/',pipeline().globalParameters.GL_DATABRICKS_WORKSPACE)",
+							"type": "Expression"
+						},
+						"env": {
+							"value": "@pipeline().globalParameters.GL_ENV",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"Creation_Date_From": {
+				"type": "string",
+				"defaultValue": "yyyy-mm-dd"
+			},
+			"Creation_Date_To": {
+				"type": "string",
+				"defaultValue": "yyyy-mm-dd"
+			},
+			"Posting_Date_From": {
+				"type": "string",
+				"defaultValue": "yyyy-mm-dd"
+			},
+			"Posting_Date_To": {
+				"type": "string",
+				"defaultValue": "yyyy-mm-dd"
+			},
+			"Load_Type": {
+				"type": "string",
+				"defaultValue": "DELTA"
+			}
+		},
+		"variables": {
+			"Check_date": {
+				"type": "String",
+				"defaultValue": "20000807034745"
+			}
+		},
+		"folder": {
+			"name": "CERES"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"name": "T_SCHEDULE_HANA_DAILY",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_DATAEXTRACTION_SAP_HANA_DELTA_TO_ADLS_MASTER_DAILY",
+					"type": "PipelineReference"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "P_DATAEXTRACTION_SAP_HANA_DELTA_TO_ADLS_TRANSACTIONAL_DAILY",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2024-08-29T02:30:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						30
+					],
+					"hours": [
+						2
+					]
+				}
+			}
+		}
+	}
+}

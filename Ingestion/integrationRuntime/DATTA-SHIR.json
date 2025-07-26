@@ -1,0 +1,13 @@
+{
+	"name": "DATTA-SHIR",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "DATTA-SHIR",
+		"typeProperties": {
+			"linkedInfo": {
+				"resourceId": "/subscriptions/6b11f399-9041-4764-a071-8fa859cb14c8/resourcegroups/AZ-AS-RGP-EX-N-SEQ01424-ADF-SHIR-MUN-UAT_ETSOM/providers/Microsoft.DataFactory/factories/eu-mun-shared-adf-uat-master/integrationruntimes/SHIRMunichUAT",
+				"authorizationType": "Rbac"
+			}
+		}
+	}
+}

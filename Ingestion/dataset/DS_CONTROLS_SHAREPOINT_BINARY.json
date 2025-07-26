@@ -1,0 +1,30 @@
+{
+	"name": "DS_CONTROLS_SHAREPOINT_BINARY",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SHAREPOINT_CONTROLS",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"RelativeURL": {
+					"value": "@dataset().RelativeURL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"RelativeURL": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			}
+		}
+	}
+}

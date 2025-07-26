@@ -1,0 +1,25 @@
+{
+	"name": "T_SCHEDULE_AUTO_TRIGGERS_ADF_HOURLY",
+	"properties": {
+		"description": "This trigger is used to run Auto trigger pipeline every hour at every 45 the minute of UTC time for ADF pipelines.",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_AUTO_TRIGGER_REQUESTS_ADF",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 1,
+				"startTime": "2025-06-03T06:45:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
