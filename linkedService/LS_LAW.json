@@ -1,0 +1,22 @@
+{
+	"name": "LS_LAW",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"Law_Base_URL": {
+				"type": "string"
+			},
+			"Law_Entra_ResourceID": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "@{linkedService().Law_Base_URL}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "ManagedServiceIdentity",
+			"aadResourceId": "@{linkedService().Law_Entra_ResourceID}"
+		}
+	}
+}

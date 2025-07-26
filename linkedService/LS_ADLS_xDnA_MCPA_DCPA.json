@@ -1,0 +1,11 @@
+{
+	"name": "LS_ADLS_xDnA_MCPA_DCPA",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://shell31eunadls2dtgumfeib.dfs.core.windows.net/"
+		}
+	}
+}

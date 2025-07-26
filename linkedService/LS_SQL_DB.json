@@ -1,0 +1,35 @@
+{
+	"name": "LS_SQL_DB",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"Server_Name": {
+				"type": "string"
+			},
+			"DB_Name": {
+				"type": "string"
+			},
+			"User_Name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "@{linkedService().Server_Name}",
+			"database": "@{linkedService().DB_Name}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "@{linkedService().User_Name}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "AZ-AS-DATTA-SQLDB-PASSWORD"
+			}
+		}
+	}
+}

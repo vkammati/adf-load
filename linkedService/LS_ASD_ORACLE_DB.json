@@ -1,0 +1,37 @@
+{
+	"name": "LS_ASD_ORACLE_DB",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"Oracle_HostName": {
+				"type": "string"
+			},
+			"Oracle_Port": {
+				"type": "string"
+			},
+			"Oracle_ServiceName": {
+				"type": "string"
+			},
+			"Oracle_UserName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Oracle",
+		"typeProperties": {
+			"connectionString": "host=@{linkedService().Oracle_HostName};port=@{linkedService().Oracle_Port};serviceName=@{linkedService().Oracle_ServiceName};user id=@{linkedService().Oracle_UserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "AZ-AS-DATTA-ASD-ORACLE-PSWD"
+			}
+		},
+		"connectVia": {
+			"referenceName": "DATTA-SHIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

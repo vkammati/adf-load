@@ -1,0 +1,28 @@
+{
+	"name": "LS_DATABRICKS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"Databricks_Workspace_URL": {
+				"type": "string"
+			},
+			"Cluster_id": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "@linkedService().Databricks_Workspace_URL",
+			"accessToken": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DATTA",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "AZ-AS-DATTA-ADF-DATABRICKS-TOKEN"
+			},
+			"existingClusterId": "@linkedService().Cluster_id"
+		}
+	}
+}

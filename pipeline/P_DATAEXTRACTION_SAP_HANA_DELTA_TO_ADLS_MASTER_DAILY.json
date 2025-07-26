@@ -1,0 +1,232 @@
+{
+	"name": "P_DATAEXTRACTION_SAP_HANA_DELTA_TO_ADLS_MASTER_DAILY",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_ProcessConfig_Table",
+				"description": "Reading Water Mark Table to get the LAST_DTM.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureDatabricksDeltaLakeSource",
+						"query": {
+							"value": "@concat('select * from `',pipeline().globalParameters.GL_CONFIG_CATALOG_NAME,'`.`raw-ds-gsap`.load_process_config','  where source_system = \"GSAP_HANA\" and table_classification in (\"M\",\"H\",\"R\") and frequency = \"D\" and load_type = \"DELTA_LOAD_HANA\" and active_flag = \"X\" ')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_ADB_DELTALAKE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Databricks_Workspace_URL": {
+								"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+								"type": "Expression"
+							},
+							"Cluster_id": {
+								"value": "@pipeline().globalParameters.GL_CLUSTER_ID",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_Table",
+				"description": "Iterate to get the Table Name and Target path from Watermark Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_ProcessConfig_Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_ProcessConfig_Table').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Copy_Deltadata_Extraction_Hana",
+							"description": "Extracting Delta Data from SAP Hana ",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SapHanaSource",
+									"query": {
+										"value": "@concat(item().source_query,' WHERE LAST_DTM >=',item().LAST_DTM)",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_GSAP_HANA",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_LANDING",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().TABLE_NAME,'_', formatDateTime(convertTimeZone(utcnow(),'UTC', 'India standard Time'),'yyyyMMdd_HHmmss'),'_','001','.parquet')",
+											"type": "Expression"
+										},
+										"Folder_Name": {
+											"value": "@item().TARGET_PATH",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Update the last_dtm in Configuration table",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "Wait Activity to avoid the concurrent failures",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": {
+									"value": "@concat(pipeline().globalParameters.GL_REPOS_PATH_MASTER,'dlt_pipelines/read_hana_delta_table')",
+									"type": "Expression"
+								},
+								"baseParameters": {
+									"target_path": {
+										"value": "@item().TARGET_PATH",
+										"type": "Expression"
+									},
+									"table_name": {
+										"value": "@item().TABLE_NAME",
+										"type": "Expression"
+									},
+									"env": {
+										"value": "@pipeline().globalParameters.GL_ENV",
+										"type": "Expression"
+									},
+									"unique_repo_branch_id": {
+										"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID",
+										"type": "Expression"
+									},
+									"repos_path": {
+										"value": "@pipeline().globalParameters.GL_REPOS_PATH_MASTER",
+										"type": "Expression"
+									},
+									"config_table_name": {
+										"value": "@pipeline().globalParameters.GL_CONFIG_TABLE_NAME",
+										"type": "Expression"
+									},
+									"raw_schema": {
+										"value": "@pipeline().globalParameters.GL_UNIQUE_REPO_BRANCH_ID_SCHEMA",
+										"type": "Expression"
+									},
+									"process_id": {
+										"value": "@item().PROCESS_ID",
+										"type": "Expression"
+									},
+									"table_classification": {
+										"value": "@item().TABLE_CLASSIFICATION",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_DATABRICKS",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"Databricks_Workspace_URL": {
+										"value": "@pipeline().globalParameters.GL_DATABRICKS_URL",
+										"type": "Expression"
+									},
+									"Cluster_id": {
+										"value": "@pipeline().globalParameters.GL_CLUSTER_ID",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Wait Activity to avoid the concurrent failures",
+							"type": "Wait",
+							"dependsOn": [
+								{
+									"activity": "Copy_Deltadata_Extraction_Hana",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 3
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "DATA INGESTION"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-12-09T12:48:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,334 @@
+{
+	"name": "P_DATAEXTRACTION_AAD_ASD_TO_ADLS",
+	"properties": {
+		"activities": [
+			{
+				"name": "ASD_To_EDS_Landing",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "SQL_AAD_To_EDS_Landing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"oracleReaderQuery": "SELECT DISTINCT R.REQ_ID, R.REQ_TYPE_ID, R.STATUS_CD, to_char(R.STATUS_DATE,'DD/MM/YYYY HH:MI:SS AM') as STATUS_DATE, to_char(R.SUBMIT_DATE,'DD/MM/YYYY HH:MI:SS AM') as SUBMIT_DATE, R.SUBMIT_BY_ID, R.SUBMIT_BY_DOMAIN, R.SUBMIT_BEHALFOF_ID, R.SUBMIT_BEHALFOF_DOMAIN, R.SYS_ID, R.APP_AREA_ID, R.ORIG_REQ_ID, SUBSTR(R.COMMENTS, 0, 75) AS COMMENTS, (case RT.Ticket when 'Y' THEN R.INTERACTION_NBR else 'NOT REQUIRED'End) INTERACTION_NBR, R.GSOM_COMPLIANT_FLG,(CASE WHEN R.REQ_TYPE_ID='15400' THEN (CASE WHEN R.GSAP_FLG='Y' THEN 'GSAP only access' WHEN R.GPMR_FLG='Y' THEN 'GPMR only access' WHEN R.GSAPGPMR_FLG='Y' THEN ('GSAP '||'&'||' GPMR access') else '' END)ELSE'' END)ACCESS_TYPE, R.LOCAL_JOBID_FLG,R.MOA_RELAVANT_FLG ,R.SOD_CONFLICT_FLG , R.CRITICAL_ROLE_FLG, R.COUNTRY_CD, R.WORKFLOW_ID, S.SYS_DESC, AA.APP_AREA_DESC, RT.REQ_TYPE_DESC,R.SUBMIT_BY_COMPANY,R.SUBMIT_BEHALFOF_COMPANY,  (CASE WHEN R.REQ_TYPE_ID='26046' THEN ( CASE  WHEN R.CREATEGSAPJOB_FLG='Y' THEN  ( CASE WHEN R.ISMASSUPDATE='Y'THEN 'MassUpdate Create GSAP Job' ELSE 'Create New GSAP Job' END) WHEN R.CREATEGPMRJOB_FLG='Y' THEN  ( CASE WHEN R.ISMASSUPDATE='Y'THEN 'MassUpdate Create GPMR Job' ELSE 'Create New GPMR Job' END)  WHEN R.CHANGEGSAPJOB_FLG='Y' THEN  ( CASE WHEN R.ISMASSUPDATE='Y'THEN 'MassUpdate Change GSAP Job' ELSE 'Change Existing GSAP Job' END)  WHEN R.CHANGEGPMRJOB_FLG='Y' THEN  ( CASE WHEN R.ISMASSUPDATE='Y'THEN 'MassUpdate Change GPMR Job' ELSE 'Change Existing GPMR Job' END) else '' END)ELSE'' END)BUSINESS_JOB_REQ_TYPE  FROM INC_MGMT.SCWEB_REQUEST_V3 R, INC_MGMT.SCWEB_SYSTEM_V3 S, INC_MGMT.SCWEB_APPLICATION_AREA_V3 AA, INC_MGMT.SCWEB_REQUEST_TYPE_V3 RT,INC_MGMT.SCWEB_REQUEST_APPROVAL_V3 RAP  WHERE S.SYS_ID = R.SYS_ID AND R.REQ_TYPE_ID = RT.REQ_TYPE_ID AND RAP.REQ_ID (+) = R.REQ_ID AND R.APP_AREA_ID = AA.APP_AREA_ID (+) AND R.SYS_ID = AA.SYS_ID (+)  AND R.SYS_ID = 10027 AND upper(R.STATUS_CD) = 'APPROVED'  AND upper(RAP.APPR_STATUS_CD) = 'APPROVED'  AND SUBMIT_DATE > sysdate - 366  ORDER BY REQ_ID DESC, SUBMIT_DATE DESC",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_ASD_ORACLE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Oracle_HostName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_HOSTNAME",
+								"type": "Expression"
+							},
+							"Oracle_Port": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_PORT",
+								"type": "Expression"
+							},
+							"Oracle_ServiceName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_SERVICE_NAME",
+								"type": "Expression"
+							},
+							"Oracle_UserName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_USERNAME",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": "Reports_data",
+							"Folder_Name": {
+								"value": "@pipeline().globalParameters.GL_CONTROLS_LANDING_PATH",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "SQL_AAD_To_EDS_Landing",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT A.*,B.short_id FROM [dbo].[USER_AAD_CONTROL_DETAILS] A LEFT JOIN [dbo].[USER_SHORTID_MAPPING]  B\nON A.UPN = B.user_id\n--WHERE ISNULL(UPN,'')<>''",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SQL_DB",
+						"type": "DatasetReference",
+						"parameters": {
+							"Server_Name": {
+								"value": "@pipeline().globalParameters.GL_SQL_SERVERNAME",
+								"type": "Expression"
+							},
+							"DB_Name": {
+								"value": "@pipeline().globalParameters.GL_SQL_DB",
+								"type": "Expression"
+							},
+							"User_Name": {
+								"value": "@pipeline().globalParameters.GL_SQL_USERNAME",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": "AAD_Details",
+							"Folder_Name": {
+								"value": "@pipeline().globalParameters.GL_CONTROLS_LANDING_PATH",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "ASD_To_EDS_Landing_Approver",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ASD_Request_DTL_To_EDS_Landing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"oracleReaderQuery": "SELECT RAP.REQ_ID,RAP.REQ_APPR_LVL_NO AS Level_No, (case when RAP.PROCESS_AREA_CD is not null then (CASE WHEN RAP.PROCESS_AREA_CD IS NULL THEN ATYP.APPR_TYPE_DESC ELSE ATYP.APPR_TYPE_DESC || ' - ' || RAP.PROCESS_AREA_CD END) else ((CASE WHEN RAP.ROLE_ID IS NOT NULL THEN ATYP.APPR_TYPE_DESC || ' - ' || RAP.ROLE_ID ELSE(CASE WHEN RAP.SUBCATEGORY IS NULL THEN ATYP.APPR_TYPE_DESC ELSE ATYP.APPR_TYPE_DESC || ' - ' || RAP.SUBCATEGORY END)END) )end) AS Approver_Type, to_char(RAP.ASSGN_DT,'DD/MM/YYYY') AS Assigned_On, to_char(RAP.APPR_DT,'DD/MM/YYYY') AS Appr_Rej_On,RAP.APPROVED_BY_GIID AS Appr_Rej_By, RAP.APPR_STATUS_CD As Approval_Status, (CASE WHEN APPR_DT IS NULL THEN to_date('10/3/2024','MM/dd/yyyy') - ASSGN_DT ELSE APPR_DT - ASSGN_DT END) AS Duration_In_Days,  INC_MGMT.SCWEB_GETAPPR_APPL_LVL_FN(RAP.REQ_APPROVAL_ID) AS Approvers FROM INC_MGMT.SCWEB_REQUEST_APPROVAL_V3 RAP, INC_MGMT.SCWEB_APPROVER_TYPE_V3 ATYP WHERE ATYP.APPR_TYPE_ID = RAP.APPR_TYPE_ID",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_ASD_ORACLE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Oracle_HostName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_HOSTNAME",
+								"type": "Expression"
+							},
+							"Oracle_Port": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_PORT",
+								"type": "Expression"
+							},
+							"Oracle_ServiceName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_SERVICE_NAME",
+								"type": "Expression"
+							},
+							"Oracle_UserName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_USERNAME",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": "Reports_Approver",
+							"Folder_Name": {
+								"value": "@pipeline().globalParameters.GL_CONTROLS_LANDING_PATH",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "ASD_Request_DTL_To_EDS_Landing",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ASD_To_EDS_Landing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"oracleReaderQuery": "select * from INC_MGMT.SCWEB_REQUEST_DETAIL_V3 where trim(req_id) in (SELECT DISTINCT trim(R.REQ_ID)  FROM INC_MGMT.SCWEB_REQUEST_V3 R, INC_MGMT.SCWEB_SYSTEM_V3 S, INC_MGMT.SCWEB_APPLICATION_AREA_V3 AA, INC_MGMT.SCWEB_REQUEST_TYPE_V3 RT,INC_MGMT.SCWEB_REQUEST_APPROVAL_V3 RAP  WHERE S.SYS_ID = R.SYS_ID AND R.REQ_TYPE_ID = RT.REQ_TYPE_ID AND RAP.REQ_ID (+) = R.REQ_ID AND R.APP_AREA_ID = AA.APP_AREA_ID (+) AND R.SYS_ID = AA.SYS_ID (+)  AND R.SYS_ID = 10027 AND upper(R.STATUS_CD) = 'APPROVED'  AND upper(RAP.APPR_STATUS_CD) = 'APPROVED'  AND SUBMIT_DATE > sysdate - 366)",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_ASD_ORACLE",
+						"type": "DatasetReference",
+						"parameters": {
+							"Oracle_HostName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_HOSTNAME",
+								"type": "Expression"
+							},
+							"Oracle_Port": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_PORT",
+								"type": "Expression"
+							},
+							"Oracle_ServiceName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_SERVICE_NAME",
+								"type": "Expression"
+							},
+							"Oracle_UserName": {
+								"value": "@pipeline().globalParameters.GL_ORACLE_USERNAME",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_LANDING",
+						"type": "DatasetReference",
+						"parameters": {
+							"File_Name": "SCWEB_REQUEST_DETAIL_V3",
+							"Folder_Name": {
+								"value": "@pipeline().globalParameters.GL_CONTROLS_LANDING_PATH",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "CONTROLS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-12-09T12:48:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
