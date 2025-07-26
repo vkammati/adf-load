@@ -1,0 +1,77 @@
+name: Deploy Ingestion ADF to TST
+run-name: Deploy Ingestion ADF to TST
+
+on:
+  workflow_dispatch: 
+  #pull_request:
+    #types: [closed]
+    #branches: [TST]
+    
+jobs:
+  build_ARM_templates:
+    name: Build ARM templates
+    runs-on: ubuntu-latest
+    environment: 
+      name: DEV
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.2.0
+############## Start: Login using SPN secret in PEM format DEV ##################################################################################      
+      - name: Login to Azure DEV
+        uses: azure/login@v2.1.1
+        with:
+          creds: ${{ secrets.DATTA_DEV_SPN_KEY_CREDENTIALS_JSON }}
+          enable-AzPSSession: true
+          allow-no-subscriptions: true
+  
+##################### End: Login using SPN secret in PEM format DEV #################################################################################  
+                
+      - name: Export ARM templates
+        id: export
+        uses: Azure/data-factory-export-action@v1.2.1
+        with:
+          path: Ingestion
+          id: /subscriptions/${{ secrets.INGESTION_ADF_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.INGESTION_ADF_RESOURCE_GROUP_NAME }}/providers/Microsoft.DataFactory/factories/${{ secrets.INGESTION_DATA_FACTORY_NAME }}
+          # id: /subscriptions/0e1845e1-8254-4871-b1ad-f54f710c3647/resourceGroups/az-dna-313-rg-tirtamrslwqvryriayyj/providers/Microsoft.DataFactory/factories/az-dna-313-eun-adf-igypoplozigtctsxofcu
+
+      - name: Upload ARM templates artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: armtemplates
+          path: ${{steps.export.outputs.arm-template-directory }}
+          if-no-files-found: error
+
+  deploy_to_tst_ingestion_adf:
+    # if: ${{ github.ref == 'refs/heads/tst' || github.ref_name == 'tst' }}
+    needs: [build_ARM_templates]
+    name: Deploy to TST ADF
+    runs-on: ubuntu-latest
+    environment: TST
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.2.0
+############## Start: Login using SPN secret in PEM format TST ##################################################################################          
+      - name: Login to Azure TST
+        uses: azure/login@v2.1.1
+        with:
+          creds: ${{ secrets.DATTA_TST_SPN_KEY_CREDENTIALS_JSON }}
+          enable-AzPSSession: true
+          allow-no-subscriptions: true
+
+##################### End: Login using SPN secret in PEM format TST #################################################################################  
+      - name: Download ARM templates artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: armtemplates
+          path: armtemplates
+
+      - name: Deploy to TST
+        uses: Azure/data-factory-deploy-action@v1.2.0
+        with:
+          resourceGroupName: ${{secrets.INGESTION_ADF_RESOURCE_GROUP_NAME}}
+          dataFactoryName: ${{secrets.INGESTION_DATA_FACTORY_NAME}}
+
+          armTemplateFile: ./armtemplates/ARMTemplateForFactory.json
+          armTemplateParametersFile: ./TST-ARMTemplateParametersForFactory.json
+
+################### End of workflow file ###################
